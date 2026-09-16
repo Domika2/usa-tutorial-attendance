@@ -47,12 +47,15 @@ def get_local_ip():
 class AttendanceHandler(http.server.BaseHTTPRequestHandler):
 
     def get_base_url(self):
+        render_url = os.environ.get("RENDER_EXTERNAL_URL")
+        if render_url:
+            return render_url.rstrip("/")
         host_header = self.headers.get("Host")
         proto = self.headers.get("X-Forwarded-Proto", "http")
         if host_header and not host_header.startswith("localhost") and not host_header.startswith("127.0.0.1"):
-            return f"{proto}://{host_header}"
+            return f"{proto}://{host_header}".rstrip("/")
         ip = get_local_ip()
-        return f"http://{ip}:{PORT}"
+        return f"http://{ip}:{PORT}".rstrip("/")
 
     def do_OPTIONS(self):
         self.send_response(200)
