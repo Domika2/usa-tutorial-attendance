@@ -5,7 +5,7 @@ import hashlib
 import secrets
 from datetime import datetime
 
-DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(__file__), "attendance.db"))
+DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(os.path.abspath(__file__)), "attendance.db"))
 
 def get_db():
     db_dir = os.path.dirname(os.path.abspath(DB_PATH))

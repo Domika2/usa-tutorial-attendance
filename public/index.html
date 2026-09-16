@@ -232,9 +232,7 @@
 
             function getApiUrl(endpoint) {
                 if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
-                if (window.location.port === "5000") return endpoint;
-                const host = window.location.hostname && window.location.hostname !== "" ? window.location.hostname : "127.0.0.1";
-                return `http://${host}:5000${endpoint}`;
+                return endpoint;
             }
 
             // Check admin status
@@ -348,7 +346,7 @@
                     }
                 } catch (err) {
                     console.error("Login error:", err);
-                    showError("Could not connect to backend server. Ensure 'py server.py' is running on port 5000.");
+                    showError("Could not connect to backend server. Please check your network connection and try again.");
                     staffSubmitBtn.disabled = false;
                     staffSubmitBtn.textContent = "Sign In to Dashboard ➔";
                 }
@@ -400,7 +398,7 @@
                     }
                 } catch (err) {
                     console.error("Create password error:", err);
-                    showError("Could not connect to backend server. Ensure 'py server.py' is running on port 5000.");
+                    showError("Could not connect to backend server. Please check your network connection and try again.");
                     createSubmitBtn.disabled = false;
                     createSubmitBtn.textContent = "Create Password & Access Dashboard ➔";
                 }

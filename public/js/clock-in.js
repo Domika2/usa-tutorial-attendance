@@ -47,9 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function getApiUrl(endpoint) {
         if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
-        if (window.location.port === "5000") return endpoint;
-        const host = window.location.hostname && window.location.hostname !== "" ? window.location.hostname : "127.0.0.1";
-        return `http://${host}:5000${endpoint}`;
+        return endpoint;
     }
 
     // Fetch server info
@@ -297,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } catch (err) {
             console.error("Clock-in error:", err);
-            const msg = "Could not connect to backend server. Please ensure 'py server.py' is running on port 5000.";
+            const msg = "Could not connect to backend server. Please check your network connection and try again.";
             if (alertEl) {
                 alertEl.className = "alert alert-danger";
                 alertEl.textContent = msg;

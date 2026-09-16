@@ -679,11 +679,14 @@ class AttendanceHandler(http.server.BaseHTTPRequestHandler):
             self.send_json({"error": str(e)}, 500)
 
 def run_server():
+    global PORT
+    PORT = int(os.environ.get("PORT", 5000))
     database.init_db()
     ip = get_local_ip()
     print("=" * 60)
     print("USA TUTORIAL CENTRE ATTENDANCE SYSTEM RUNNING")
     print("=" * 60)
+    print(f"Host Binding:      0.0.0.0:{PORT}")
     print(f"Local Access:      http://localhost:{PORT}")
     print(f"Network / QR URL:  http://{ip}:{PORT}")
     print(f"Role Select / Hub: http://{ip}:{PORT}/index.html")
@@ -697,6 +700,7 @@ def run_server():
         allow_reuse_address = True
 
     with ReusableTCPServer(("0.0.0.0", PORT), AttendanceHandler) as httpd:
+        print(f"Server successfully listening on 0.0.0.0:{PORT}")
         httpd.serve_forever()
 
 if __name__ == "__main__":

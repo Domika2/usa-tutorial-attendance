@@ -2,9 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     function getApiUrl(endpoint) {
         if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
-        if (window.location.port === "5000") return endpoint;
-        const host = window.location.hostname && window.location.hostname !== "" ? window.location.hostname : "127.0.0.1";
-        return `http://${host}:5000${endpoint}`;
+        return endpoint;
     }
 
     const authModal = document.getElementById("authModal");
@@ -264,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             } catch (err) {
                 console.error("Login error:", err);
-                showPinError("Could not connect to backend server. Ensure 'py server.py' is running on port 5000.");
+                showPinError("Could not connect to backend server. Please verify your network connection and try again.");
             } finally {
                 pinSubmitBtn.disabled = false;
                 pinSubmitBtn.textContent = "Sign In to Dashboard ➔";
@@ -323,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             } catch (err) {
                 console.error("Create password error:", err);
-                showPinError("Could not connect to backend server. Ensure 'py server.py' is running on port 5000.");
+                showPinError("Could not connect to backend server. Please verify your network connection and try again.");
                 createSubmitBtn.disabled = false;
                 createSubmitBtn.textContent = "Create Password & Enter Dashboard ➔";
             }
@@ -396,7 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             } catch (err) {
                 console.error("Change password error:", err);
-                showChangePassAlert("Could not connect to backend server. Ensure 'py server.py' is running on port 5000.", "danger");
+                showChangePassAlert("Could not connect to backend server. Please verify your network connection and try again.", "danger");
             } finally {
                 savePassBtn.disabled = false;
                 savePassBtn.textContent = "Update Password";

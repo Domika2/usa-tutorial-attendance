@@ -29,9 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function getApiUrl(endpoint) {
         if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
-        if (window.location.port === "5000") return endpoint;
-        const host = window.location.hostname && window.location.hostname !== "" ? window.location.hostname : "127.0.0.1";
-        return `http://${host}:5000${endpoint}`;
+        return endpoint;
     }
 
     // 1. Fetch current server and QR info
