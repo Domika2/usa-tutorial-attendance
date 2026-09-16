@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Clock Out | USA Tutorial Centre</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header-nav">
+            <a href="index.html" class="brand">
+                <img src="images/logo.png" alt="USA Tutorial Centre" class="brand-logo-img">
+                <div class="brand-info">
+                    <h1 id="centreNameDisplay">USA Tutorial Centre</h1>
+                    <span>Student Departure Portal</span>
+                </div>
+            </a>
+            <nav class="nav-links">
+                <a href="clock-in.html" class="nav-link" style="color: var(--blue-600);">Switch to Clock In</a>
+                <a href="index.html" class="nav-link">Main Portal</a>
+            </nav>
+        </header>
+
+        <main class="portal-container">
+            <!-- Digital Clock Widget -->
+            <div class="clock-widget">
+                <div class="digital-time" id="liveTime">--:--:-- --</div>
+                <div class="digital-date" id="liveDate">Loading date...</div>
+                <div class="status-tag tag-out">
+                    <span>● EXIT CLOCK-OUT ACTIVE</span>
+                </div>
+            </div>
+
+            <!-- 1-Tap Quick Clock-Out Card (for returning students who filled details once) -->
+            <div class="clean-card border-red quick-card" id="quickClockOutCard" style="display: none;">
+                <div class="student-avatar-circle avatar-red" id="quickAvatar">ST</div>
+                <div class="badge-profile-saved" style="background: #fef2f2; color: #991b1b; border-color: #fecaca;">
+                    <span>✓ Verified Student</span>
+                </div>
+                <h2 class="page-title" id="quickStudentName" style="margin-bottom: 0.2rem; font-size: 1.55rem;">Student Name</h2>
+                <p class="page-subtitle" id="quickStudentEmail" style="margin-bottom: 1.25rem; font-size: 0.88rem; word-break: break-all;">student@example.com</p>
+
+                <div class="receipt-card" style="text-align: left; margin-bottom: 1.5rem;">
+                    <div class="receipt-row">
+                        <span class="receipt-label">Tutorial Branch</span>
+                        <span class="receipt-val" id="quickBranch" style="font-weight: 600;">Popoola Branch</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Class Session</span>
+                        <span class="receipt-val" id="quickSession" style="color: var(--purple-700); font-weight: 600;">Morning Session</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Today's Arrival Time</span>
+                        <span class="receipt-val highlight-blue" id="quickTimeIn">Recorded</span>
+                    </div>
+                </div>
+
+                <!-- Alert for quick clock out -->
+                <div id="quickAlertBox" class="alert alert-danger" style="display: none; margin-bottom: 1.25rem;"></div>
+
+                <button type="button" id="quickClockOutBtn" class="btn-onetap-clockout">
+                    <span>🚪 Click to Clock Out</span>
+                </button>
+
+                <div style="margin-top: 1.25rem; font-size: 0.82rem; color: var(--text-muted); display: flex; justify-content: center; gap: 1rem;">
+                    <a href="#" id="editDetailsLink" style="color: var(--red-600); text-decoration: underline; font-weight: 500;">
+                        ✏️ Different student / manual entry
+                    </a>
+                </div>
+            </div>
+
+            <!-- Form Card -->
+            <div class="clean-card border-red" id="formCard">
+                <div class="page-header">
+                    <h2 class="page-title">Student Clock Out</h2>
+                    <p class="page-subtitle">Confirm your details to record your departure</p>
+                </div>
+
+                <div id="cancelEditContainer" style="display: none; margin-bottom: 1rem; text-align: right;">
+                    <button type="button" id="cancelEditBtn" class="btn btn-sm btn-outline">✕ Cancel & Return to 1-Click Clock-Out</button>
+                </div>
+
+                <!-- Alert placeholder -->
+                <div id="alertBox" class="alert alert-danger" style="display: none;"></div>
+
+                <form id="clockOutForm">
+                    <div class="form-group">
+                        <label class="form-label" for="studentName">
+                            <span>Full Name</span>
+                            <span style="color: var(--red-600); font-size: 0.75rem;">* Required</span>
+                        </label>
+                        <input type="text" id="studentName" class="form-control" placeholder="e.g. Alex Johnson" required autocomplete="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="studentEmail">
+                            <span>Email Address</span>
+                            <span style="color: var(--red-600); font-size: 0.75rem;">* Required</span>
+                        </label>
+                        <input type="email" id="studentEmail" class="form-control" placeholder="e.g. alex.j@example.com" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="studentBranch">
+                            <span>Tutorial Branch</span>
+                            <span style="color: var(--red-600); font-size: 0.75rem;">* Required</span>
+                        </label>
+                        <select id="studentBranch" class="form-control" required>
+                            <option value="Popoola Branch">Popoola Branch</option>
+                            <option value="Kilimanjaro Branch">Kilimanjaro Branch</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="classSession">
+                            <span>Class Session</span>
+                            <span style="color: var(--red-600); font-size: 0.75rem;">* Required</span>
+                        </label>
+                        <select id="classSession" class="form-control" required>
+                            <option value="Morning Session">Morning Session (9:00 AM – 2:30 PM)</option>
+                            <option value="Evening Session">Evening Session (3:00 PM – 7:00 PM)</option>
+                            <option value="Both Sessions">Both Sessions (Morning & Evening)</option>
+                        </select>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                            Note: Morning Session ends at 2:30 PM. Only students in Both Sessions can clock-in morning and clock-out evening.
+                        </div>
+                    </div>
+
+                    <button type="submit" id="clockOutBtn" class="btn btn-clockout btn-block" style="margin-top: 1.25rem;">
+                        <span>Clock Out</span>
+                        <span>➔</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Success Departure Receipt Card -->
+            <div class="clean-card border-red" id="successCard" style="display: none; text-align: center;">
+                <div style="font-size: 2.75rem; margin-bottom: 0.5rem;">👋</div>
+                <h2 class="page-title" id="resTitle" style="color: var(--red-700);">Clock Out Recorded!</h2>
+                <p class="page-subtitle">Have a safe journey home. See you next time!</p>
+
+                <div class="receipt-card">
+                    <div class="receipt-row">
+                        <span class="receipt-label">Student Name</span>
+                        <span class="receipt-val" id="resName">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Email Address</span>
+                        <span class="receipt-val" id="resEmail">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Tutorial Branch</span>
+                        <span class="receipt-val" id="resBranch">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Class Session</span>
+                        <span class="receipt-val" id="resSession" style="color: var(--purple-700); font-weight: 600;">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Time In</span>
+                        <span class="receipt-val highlight-blue" id="resTimeIn">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Time Out</span>
+                        <span class="receipt-val highlight-red" id="resTimeOut">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Total Duration</span>
+                        <span class="receipt-val highlight-purple" id="resDuration">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Status</span>
+                        <span class="receipt-val badge-status-out">Completed</span>
+                    </div>
+                </div>
+
+                <div class="locked-device-badge" style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 0.9rem 1.1rem; border-radius: var(--radius-md); font-size: 0.85rem; margin: 1.25rem 0; text-align: left; display: flex; align-items: flex-start; gap: 0.65rem;">
+                    <span style="font-size: 1.35rem; line-height: 1;">🔒</span>
+                    <div>
+                        <strong style="display: block; font-size: 0.92rem; color: #7f1d1d;">Departure Confirmed</strong>
+                        <p style="margin: 0.25rem 0 0 0; color: #991b1b; font-size: 0.82rem; line-height: 1.4;">
+                            Your departure has been logged for today. Each student must clock out using their own smartphone.
+                        </p>
+                    </div>
+                </div>
+
+                <a href="index.html" class="btn btn-outline btn-block" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <span>Return to Main Portal</span>
+                </a>
+            </div>
+
+            <div style="text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text-muted);">
+                Arriving just now? <a href="clock-in.html" style="color: var(--blue-600); font-weight: 600; text-decoration: none;">Clock In Here ➔</a>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/clock-out.js"></script>
+</body>
+</html>

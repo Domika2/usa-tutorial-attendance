@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Admin Dashboard | USA Tutorial Centre</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Staff Sign-In & Password Setup Modal (Shown if not signed in) -->
+    <div id="authModal" class="modal-backdrop">
+        <div class="modal-content" style="text-align: left;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <img src="images/logo.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                    <h3 class="modal-title" style="color: var(--purple-800); font-size: 1.15rem;">Admin Access</h3>
+                </div>
+                <a href="index.html" class="modal-close" style="text-decoration: none;">&times;</a>
+            </div>
+
+            <!-- Setup Banner (Shown when no admin password exists yet) -->
+            <div id="setupBanner" class="badge-setup" style="display: none; width: 100%; justify-content: center;">
+                <span>🔒 Setup Required: Create your Admin password below</span>
+            </div>
+
+            <!-- Tabs: Sign In vs Create Password -->
+            <div class="auth-tabs" id="authTabs">
+                <button type="button" class="auth-tab-btn active" id="tabSignIn">Sign In</button>
+                <button type="button" class="auth-tab-btn" id="tabCreatePassword">Create Admin Password</button>
+            </div>
+
+            <div id="pinError" class="alert alert-danger" style="display: none;"></div>
+            <div id="pinSuccess" class="alert alert-success" style="display: none;"></div>
+
+            <!-- TAB 1: Sign In Form -->
+            <form id="staffLoginForm">
+                <div class="form-group">
+                    <label class="form-label" for="staffLoginName">Admin Username or Name</label>
+                    <input type="text" id="staffLoginName" class="form-control" placeholder="e.g. admin" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="staffLoginPassword">Password</label>
+                    <div class="password-input-wrap">
+                        <input type="password" id="staffLoginPassword" class="form-control" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle-btn" id="toggleLoginPass" title="Show / hide password">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="pinSubmitBtn" class="btn btn-purple btn-block" style="margin-top: 1.25rem;">
+                    Sign In to Dashboard ➔
+                </button>
+            </form>
+
+            <!-- TAB 2: Create Admin Password Form -->
+            <form id="createPasswordForm" style="display: none;">
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+                    Create your administrator password for secure login to USA Tutorial Centre.
+                </p>
+
+                <div class="form-group">
+                    <label class="form-label" for="createFullName">Full Name</label>
+                    <input type="text" id="createFullName" class="form-control" placeholder="e.g. Eleanor Vance" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="createUsername">Admin Username</label>
+                    <input type="text" id="createUsername" class="form-control" placeholder="e.g. admin" required minlength="3">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="createPassword">Password (Min. 6 characters)</label>
+                    <div class="password-input-wrap">
+                        <input type="password" id="createPassword" class="form-control" placeholder="Choose a password" required minlength="6">
+                        <button type="button" class="password-toggle-btn" id="toggleCreatePass" title="Show / hide password">👁️</button>
+                    </div>
+                    <div class="password-help-text">Password must be at least 6 characters.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="createRole">Role</label>
+                    <select id="createRole" class="form-control" required>
+                        <option value="Director">Director / Principal</option>
+                        <option value="Admin">Administrator</option>
+                        <option value="Secretary">Secretary</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="createSubmitBtn" class="btn btn-purple btn-block" style="margin-top: 1.25rem;">
+                    Create Password & Enter Dashboard ➔
+                </button>
+            </form>
+
+            <div style="margin-top: 1.25rem; text-align: center;">
+                <a href="index.html" class="btn btn-outline btn-sm">Return to Main Portal</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard View -->
+    <div class="app-container" id="adminDashboardView" style="display: none;">
+        <!-- Header Nav -->
+        <header class="header-nav">
+            <a href="index.html" class="brand">
+                <img src="images/logo.png" alt="USA Tutorial Centre" class="brand-logo-img">
+                <div class="brand-info">
+                    <h1 id="centreTitle">USA Tutorial Centre</h1>
+                    <span id="staffIdentityBadge">Staff Management Portal</span>
+                </div>
+            </a>
+            <div class="nav-links">
+                <span class="staff-badge-header" id="activeStaffBadge">
+                    👤 <span id="badgeStaffName">Staff</span> (<span id="badgeStaffRole">Role</span>)
+                </span>
+                <span class="live-sync-badge" id="liveSyncBadge" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; font-weight: 600; color: #166534; background: #dcfce7; border: 1px solid #bbf7d0; padding: 0.3rem 0.65rem; border-radius: 9999px; transition: all 0.3s ease;" title="Auto-updating in real-time on every student clock-in and clock-out">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e; display: inline-block;"></span>
+                    Live Sync
+                </span>
+                <button type="button" id="adminQrRefreshBtn" class="btn btn-outline btn-sm" title="Refresh Daily QR Token">
+                    🔄 QR Refresh
+                </button>
+                <a href="qr-posters.html" target="_blank" class="btn btn-outline btn-sm">🖨️ Print QR Posters</a>
+                <button type="button" id="openChangePassBtn" class="btn btn-outline btn-sm" title="Change Admin Password">
+                    🔑 Password
+                </button>
+                <button type="button" id="adminLogoutBtn" class="btn btn-outline btn-sm" style="color: var(--red-600); border-color: var(--red-100);">
+                    Sign Out
+                </button>
+            </div>
+        </header>
+
+        <!-- Urgent Absentee / Late Check-In Alerts Section -->
+        <section id="absenteeAlertsSection" class="clean-card" style="display: none; margin-bottom: 1.5rem; border-left: 4px solid var(--red-600); background: #fff5f5;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.3rem;">⚠️</span>
+                    <h3 style="font-size: 1.05rem; font-weight: 700; color: #991b1b; margin: 0;">
+                        Student Absentee / Late Check-In Alerts
+                    </h3>
+                    <span class="badge" id="absenteeBadgeCount" style="background: #ef4444; color: white; padding: 0.15rem 0.55rem; border-radius: 9999px; font-size: 0.75rem;">0</span>
+                </div>
+                <span style="font-size: 0.78rem; color: #7f1d1d;">
+                    Morning (9am–12pm) & Evening (3pm–5pm) • Remains until acknowledged
+                </span>
+            </div>
+            <p style="font-size: 0.84rem; color: #7f1d1d; margin-bottom: 1rem;">
+                The following registered students have not clocked in for their scheduled session today. Please reach out to the student or their parent directly.
+            </p>
+            <div id="absenteeAlertsList" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <!-- Dynamically rendered alert cards with OK button -->
+            </div>
+        </section>
+
+        <!-- Stats Overview -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon icon-inside">🟢</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statInside">0</div>
+                    <div class="stat-label">Currently in Centre</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-today">🎓</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statToday">0</div>
+                    <div class="stat-label">Total Clocked In Today</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-completed">🏁</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statCompleted">0</div>
+                    <div class="stat-label">Completed & Departed</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-duration">⏱️</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statAvgDuration">0 mins</div>
+                    <div class="stat-label">Avg. Study Duration</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Controls Bar -->
+        <section class="table-controls">
+            <div class="table-filters">
+                <div style="min-width: 200px; flex: 1;">
+                    <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search name, email, phone, branch...">
+                </div>
+
+                <select id="branchFilter" class="form-control" style="width: auto; min-width: 150px;">
+                    <option value="ALL">All Branches</option>
+                    <option value="Popoola Branch">Popoola Branch</option>
+                    <option value="Kilimanjaro Branch">Kilimanjaro Branch</option>
+                </select>
+
+                <select id="sessionFilter" class="form-control" style="width: auto; min-width: 140px;">
+                    <option value="ALL">All Sessions</option>
+                    <option value="Morning Session">Morning Session</option>
+                    <option value="Evening Session">Evening Session</option>
+                    <option value="Both Sessions">Both Sessions</option>
+                </select>
+
+                <input type="date" id="dateFilter" class="form-control" style="width: auto; min-width: 150px;">
+
+                <select id="statusFilter" class="form-control" style="width: auto; min-width: 140px;">
+                    <option value="ALL">All Statuses</option>
+                    <option value="CLOCKED_IN">In Session</option>
+                    <option value="COMPLETED">Completed</option>
+                </select>
+
+                <button type="button" id="refreshBtn" class="btn btn-outline btn-sm" title="Refresh records">
+                    🔄 Refresh
+                </button>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span id="recordCount" style="font-size: 0.82rem; color: var(--text-muted);">0 records</span>
+                <button type="button" id="openManualBtn" class="btn btn-outline btn-sm">
+                    ➕ Manual Entry
+                </button>
+                <button type="button" id="exportBtn" class="btn btn-primary btn-sm">
+                    📥 Export CSV
+                </button>
+                <button type="button" id="clearAllBtn" class="btn btn-outline btn-sm" style="color: var(--red-600); border-color: var(--red-100);" title="Permanently clear attendance records">
+                    🗑️ Clear Records
+                </button>
+            </div>
+        </section>
+
+        <!-- Attendance Records Data Table -->
+        <section class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Student Details</th>
+                        <th>Branch</th>
+                        <th>Session</th>
+                        <th>Contacts</th>
+                        <th>Date</th>
+                        <th>Time In</th>
+                        <th>Time Out</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsTableBody">
+                    <!-- Populated dynamically -->
+                </tbody>
+            </table>
+
+            <!-- Empty State -->
+            <div id="tableEmptyState" style="text-align: center; padding: 3rem 1.5rem; display: none;">
+                <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📋</div>
+                <h4 style="color: var(--text-main); font-family: var(--font-heading); margin-bottom: 0.25rem;">No Attendance Records Found</h4>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Try adjusting your filters, search term, or branch selection.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Manual Entry Modal -->
+    <div id="manualModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Manual Attendance Entry</h3>
+                <button type="button" id="closeManualBtn" class="modal-close">&times;</button>
+            </div>
+
+            <div id="manualAlert" class="alert alert-danger" style="display: none;"></div>
+
+            <form id="manualForm">
+                <div class="form-group">
+                    <label class="form-label" for="manualName">Student Full Name</label>
+                    <input type="text" id="manualName" class="form-control" required placeholder="e.g. Maya Patel">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="manualEmail">Student Email</label>
+                    <input type="email" id="manualEmail" class="form-control" required placeholder="e.g. maya@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="manualBranch">Tutorial Branch</label>
+                    <select id="manualBranch" class="form-control" required>
+                        <option value="Popoola Branch">Popoola Branch</option>
+                        <option value="Kilimanjaro Branch">Kilimanjaro Branch</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="manualSession">Class Session</label>
+                    <select id="manualSession" class="form-control" required>
+                        <option value="Morning Session">Morning Session (9:00 AM – 2:30 PM)</option>
+                        <option value="Evening Session">Evening Session (3:00 PM – 7:00 PM)</option>
+                        <option value="Both Sessions">Both Sessions (Morning & Evening)</option>
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="manualCallNumber">Student Call No.</label>
+                        <input type="tel" id="manualCallNumber" class="form-control" placeholder="08012345678">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="manualParentPhone">Parent Phone No.</label>
+                        <input type="tel" id="manualParentPhone" class="form-control" placeholder="08098765432">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="manualDate">Date</label>
+                    <input type="date" id="manualDate" class="form-control" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="manualTimeIn">Time In</label>
+                        <input type="text" id="manualTimeIn" class="form-control" required placeholder="09:00:00 AM">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="manualTimeOut">Time Out (Optional)</label>
+                        <input type="text" id="manualTimeOut" class="form-control" placeholder="12:30:00 PM">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="manualNotes">Notes (Optional)</label>
+                    <input type="text" id="manualNotes" class="form-control" placeholder="e.g. Backfilled by Secretary">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                    Save Attendance Record
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePassModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color: var(--purple-800);">🔑 Change Admin Password</h3>
+                <button type="button" id="closeChangePassBtn" class="modal-close">&times;</button>
+            </div>
+
+            <div id="changePassAlert" class="alert alert-danger" style="display: none;"></div>
+
+            <form id="changePassForm">
+                <div class="form-group">
+                    <label class="form-label" for="currPass">Current Password</label>
+                    <div class="password-input-wrap">
+                        <input type="password" id="currPass" class="form-control" required placeholder="Enter current password">
+                        <button type="button" class="password-toggle-btn" id="toggleCurrPass" title="Show / hide password">👁️</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="newPass">New Password (Min. 6 characters)</label>
+                    <div class="password-input-wrap">
+                        <input type="password" id="newPass" class="form-control" required minlength="6" placeholder="Enter new password">
+                        <button type="button" class="password-toggle-btn" id="toggleNewPass" title="Show / hide password">👁️</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmPass">Confirm New Password</label>
+                    <div class="password-input-wrap">
+                        <input type="password" id="confirmPass" class="form-control" required minlength="6" placeholder="Re-type new password">
+                        <button type="button" class="password-toggle-btn" id="toggleConfirmPass" title="Show / hide password">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="savePassBtn" class="btn btn-purple btn-block" style="margin-top: 1rem;">
+                    Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
+

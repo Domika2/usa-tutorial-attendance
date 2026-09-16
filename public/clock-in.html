@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Clock In | USA Tutorial Centre</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header-nav">
+            <a href="index.html" class="brand">
+                <img src="images/logo.png" alt="USA Tutorial Centre" class="brand-logo-img">
+                <div class="brand-info">
+                    <h1 id="centreNameDisplay">USA Tutorial Centre</h1>
+                    <span>Student Arrival Portal</span>
+                </div>
+            </a>
+            <nav class="nav-links">
+                <a href="clock-out.html" class="nav-link" style="color: var(--red-600);">Switch to Clock Out</a>
+                <a href="index.html" class="nav-link">Main Portal</a>
+            </nav>
+        </header>
+
+        <main class="portal-container">
+            <!-- Digital Clock Widget -->
+            <div class="clock-widget">
+                <div class="digital-time" id="liveTime">--:--:-- --</div>
+                <div class="digital-date" id="liveDate">Loading date...</div>
+                <div class="status-tag tag-in">
+                    <span>● ENTRANCE CLOCK-IN ACTIVE</span>
+                </div>
+            </div>
+
+            <!-- 1-Tap Quick Clock-In Card (for returning students who filled details once) -->
+            <div class="clean-card border-blue quick-card" id="quickClockInCard" style="display: none;">
+                <div class="student-avatar-circle avatar-blue" id="quickAvatar">ST</div>
+                <div class="badge-profile-saved">
+                    <span>✓ Profile Saved on Device</span>
+                </div>
+                <h2 class="page-title" id="quickStudentName" style="margin-bottom: 0.2rem; font-size: 1.55rem;">Student Name</h2>
+                <p class="page-subtitle" id="quickStudentEmail" style="margin-bottom: 1.25rem; font-size: 0.88rem; word-break: break-all;">student@example.com</p>
+
+                <div class="receipt-card" style="text-align: left; margin-bottom: 1.5rem;">
+                    <div class="receipt-row">
+                        <span class="receipt-label">Tutorial Branch</span>
+                        <span class="receipt-val" id="quickBranch" style="font-weight: 600;">Popoola Branch</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Class Session</span>
+                        <span class="receipt-val" id="quickSession" style="color: var(--purple-700); font-weight: 600;">Morning Session</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Student Phone</span>
+                        <span class="receipt-val" id="quickPhone">--</span>
+                    </div>
+                </div>
+
+                <!-- Alert for quick clock in -->
+                <div id="quickAlertBox" class="alert alert-danger" style="display: none; margin-bottom: 1.25rem;"></div>
+
+                <button type="button" id="quickClockInBtn" class="btn-onetap-clockin">
+                    <span>⚡ Click to Clock In</span>
+                </button>
+
+                <div style="margin-top: 1.25rem; font-size: 0.82rem; color: var(--text-muted); display: flex; justify-content: center; gap: 1rem;">
+                    <a href="#" id="editDetailsLink" style="color: var(--blue-600); text-decoration: underline; font-weight: 500;">
+                        ✏️ Edit phone numbers or details
+                    </a>
+                </div>
+            </div>
+
+            <!-- Form Card (First-time registration) -->
+            <div class="clean-card border-blue" id="formCard">
+                <div class="page-header">
+                    <h2 class="page-title">Student Clock In</h2>
+                    <p class="page-subtitle">Fill your details once. On subsequent visits you will only click Clock In.</p>
+                </div>
+
+                <div id="cancelEditContainer" style="display: none; margin-bottom: 1rem; text-align: right;">
+                    <button type="button" id="cancelEditBtn" class="btn btn-sm btn-outline">✕ Cancel & Return to Quick Clock-In</button>
+                </div>
+
+                <!-- Alert placeholder -->
+                <div id="alertBox" class="alert alert-danger" style="display: none;"></div>
+
+                <form id="clockInForm">
+                    <div class="form-group">
+                        <label class="form-label" for="studentName">
+                            <span>Full Name</span>
+                            <span style="color: var(--red-600); font-size: 0.75rem;">* Required</span>
+                        </label>
+                        <input type="text" id="studentName" class="form-control" placeholder="e.g. Alex Johnson" required autocomplete="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="studentEmail">
+                            <span>Email Address</span>
+                            <span style="color: var(--red-600); font-size: 0.75rem;">* Required</span>
+                        </label>
+                        <input type="email" id="studentEmail" class="form-control" placeholder="e.g. alex.j@example.com" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="studentBranch">
+                            <span>Tutorial Branch</span>
+                            <span style="color: var(--red-600); font-size: 0.75rem;">* Required</span>
+                        </label>
+                        <select id="studentBranch" class="form-control" required>
+                            <option value="Popoola Branch">Popoola Branch</option>
+                            <option value="Kilimanjaro Branch">Kilimanjaro Branch</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="classSession">
+                            <span>Class Session</span>
+                            <span style="color: var(--red-600); font-size: 0.75rem;">* Required</span>
+                        </label>
+                        <select id="classSession" class="form-control" required>
+                            <option value="Morning Session">Morning Session (9:00 AM – 2:30 PM)</option>
+                            <option value="Evening Session">Evening Session (3:00 PM – 7:00 PM)</option>
+                            <option value="Both Sessions">Both Sessions (Morning & Evening)</option>
+                        </select>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                            Note: Only students enrolled in Both Sessions may clock-in in morning and clock-out in evening.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="studentCallNumber">
+                            <span>Student's Call Number</span>
+                            <span style="color: var(--red-600); font-size: 0.75rem;">* Required</span>
+                        </label>
+                        <input type="tel" id="studentCallNumber" class="form-control" placeholder="e.g. 08012345678" required autocomplete="tel">
+                    </div>
+
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                            <label class="form-label" for="studentWhatsapp" style="margin-bottom: 0;">
+                                <span>Student's WhatsApp Number</span>
+                                <span style="color: var(--red-600); font-size: 0.75rem;">* Required</span>
+                            </label>
+                            <label style="font-size: 0.75rem; color: var(--blue-700); cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
+                                <input type="checkbox" id="sameAsCallCheck"> Same as call number
+                            </label>
+                        </div>
+                        <input type="tel" id="studentWhatsapp" class="form-control" placeholder="e.g. 08012345678" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="parentPhone">
+                            <span>Parent's Phone Number</span>
+                            <span style="color: var(--red-600); font-size: 0.75rem;">* Required</span>
+                        </label>
+                        <input type="tel" id="parentPhone" class="form-control" placeholder="e.g. 08098765432" required>
+                    </div>
+
+                    <label class="remember-check">
+                        <input type="checkbox" id="rememberMe" checked>
+                        <span>Remember my details on this phone for quick future check-ins</span>
+                    </label>
+
+                    <button type="submit" id="clockInBtn" class="btn btn-clockin btn-block">
+                        <span>Clock In</span>
+                        <span>➔</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Success Confirmation Card -->
+            <div class="clean-card border-blue" id="successCard" style="display: none; text-align: center;">
+                <div style="font-size: 2.75rem; margin-bottom: 0.5rem;">✅</div>
+                <h2 class="page-title" id="resTitle" style="color: var(--blue-700);">Clock In Recorded!</h2>
+                <p class="page-subtitle">Your attendance has been logged successfully.</p>
+
+                <div class="receipt-card">
+                    <div class="receipt-row">
+                        <span class="receipt-label">Student Name</span>
+                        <span class="receipt-val" id="resName">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Email Address</span>
+                        <span class="receipt-val" id="resEmail">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Tutorial Branch</span>
+                        <span class="receipt-val" id="resBranch">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Class Session</span>
+                        <span class="receipt-val" id="resSession" style="color: var(--purple-700); font-weight: 600;">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Student Phone</span>
+                        <span class="receipt-val" id="resPhone">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Parent Phone</span>
+                        <span class="receipt-val" id="resParentPhone">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Date</span>
+                        <span class="receipt-val" id="resDate">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Time In</span>
+                        <span class="receipt-val highlight-blue" id="resTimeIn">--</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Status</span>
+                        <span class="receipt-val badge-status-in">In Session</span>
+                    </div>
+                </div>
+
+                <div class="locked-device-badge" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 0.9rem 1.1rem; border-radius: var(--radius-md); font-size: 0.85rem; margin: 1.25rem 0; text-align: left; display: flex; align-items: flex-start; gap: 0.65rem;">
+                    <span style="font-size: 1.35rem; line-height: 1;">🔒</span>
+                    <div>
+                        <strong style="display: block; font-size: 0.92rem; color: #14532d;">Device Locked: Attendance Recorded</strong>
+                        <p style="margin: 0.25rem 0 0 0; color: #15803d; font-size: 0.82rem; line-height: 1.4;">
+                            You have successfully clocked in for today. Each student must scan the QR code using their own smartphone—this device cannot be used to clock in another student.
+                        </p>
+                    </div>
+                </div>
+
+                <a href="clock-out.html" class="btn btn-block" style="background: var(--red-600); color: white; text-decoration: none; padding: 0.85rem; border-radius: var(--radius-md); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <span>When Leaving: Go to Clock-Out Portal</span>
+                    <span>➔</span>
+                </a>
+            </div>
+
+            <div style="text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text-muted);">
+                Leaving the centre? <a href="clock-out.html" style="color: var(--red-600); font-weight: 600; text-decoration: none;">Clock Out Here ➔</a>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/clock-in.js"></script>
+</body>
+</html>

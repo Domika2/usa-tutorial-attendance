@@ -1,0 +1,31 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite Database files (keep attendance.db local, do not commit production data)
+*.db
+*.db-journal
+*.db.bak
+attendance.db
+attendance.db.bak
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Test scripts and temporary files
+scratch/
+.system_generated/

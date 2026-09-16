@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Access | USA Tutorial Centre</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container" style="justify-content: center; min-height: 90vh;">
+        <!-- Header -->
+        <header class="header-nav" style="margin-bottom: 1.5rem;">
+            <div class="brand">
+                <img src="images/logo.png" alt="USA Tutorial Centre" class="brand-logo-img">
+                <div class="brand-info">
+                    <h1 id="centreNameDisplay">USA Tutorial Centre</h1>
+                    <span>Attendance & Management Portal</span>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="qr-posters.html" class="nav-link">QR Posters 🖨️</a>
+            </nav>
+        </header>
+
+        <!-- Main Role Selection Screen -->
+        <main class="clean-card" style="max-width: 600px; margin: 0 auto; width: 100%; text-align: center;">
+            <div class="page-header" style="margin-bottom: 1.5rem;">
+                <img src="images/logo.png" alt="USA Tutorial Centre" class="brand-logo-lg">
+                <h2 class="page-title" style="font-size: 1.85rem;">USA Tutorial Centre</h2>
+                <p class="page-subtitle">Unique Success Academy • Please select your portal to proceed</p>
+                <div id="branchBanner" style="display: none; margin-top: 0.75rem; padding: 0.4rem 1.1rem; border-radius: 9999px; background: var(--blue-50); color: var(--blue-700); font-weight: 600; font-size: 0.88rem; border: 1px solid var(--blue-200); align-items: center; justify-content: center; gap: 0.4rem;">
+                    <span>📍</span> <span id="branchBannerText">Popoola Branch</span>
+                </div>
+            </div>
+
+            <div class="role-choice-grid">
+                <!-- Student Role Button -->
+                <div class="role-card-btn btn-student-role" id="btnStudentRole">
+                    <div class="role-icon-lg" style="background: var(--blue-50); color: var(--blue-600);">
+                        🎓
+                    </div>
+                    <div class="role-title" style="color: var(--blue-700);">I am a Student</div>
+                    <div class="role-desc">Record your attendance (Clock In or Clock Out) for your classes</div>
+                    <span class="btn btn-primary btn-sm" style="margin-top: 0.5rem; width: 100%;">
+                        Continue as Student ➔
+                    </span>
+                </div>
+
+                <!-- Staff Role Button -->
+                <div class="role-card-btn btn-staff-role" id="btnStaffRole">
+                    <div class="role-icon-lg" style="background: var(--purple-50); color: var(--purple-700);">
+                        👔
+                    </div>
+                    <div class="role-title" style="color: var(--purple-800);">I am an Admin / Staff</div>
+                    <div class="role-desc">Access live register, daily reports, and administrative dashboard</div>
+                    <span class="btn btn-purple btn-sm" style="margin-top: 0.5rem; width: 100%;">
+                        Admin Access ➔
+                    </span>
+                </div>
+            </div>
+
+            <!-- Student Action Choice Modal (Clock-In vs Clock-Out) -->
+            <div id="studentChoiceModal" class="modal-backdrop">
+                <div class="modal-content" style="text-align: center;">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Student Attendance</h3>
+                        <button type="button" class="modal-close" id="closeStudentModal">&times;</button>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem;">
+                        Are you arriving at USA Tutorial Centre or heading home?
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                        <a href="clock-in.html" id="linkClockIn" class="btn btn-clockin btn-block" style="font-size: 1rem; padding: 0.85rem;">
+                            🟢 Clock In (Arrival)
+                        </a>
+                        <a href="clock-out.html" id="linkClockOut" class="btn btn-clockout btn-block" style="font-size: 1rem; padding: 0.85rem;">
+                            🔴 Clock Out (Departure)
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin / Staff Login & Password Setup Modal -->
+            <div id="staffModal" class="modal-backdrop">
+                <div class="modal-content" style="text-align: left;">
+                    <div class="modal-header">
+                        <div style="display: flex; align-items: center; gap: 0.65rem;">
+                            <img src="images/logo.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                            <h3 class="modal-title" style="color: var(--purple-800); font-size: 1.15rem;">Admin Access</h3>
+                        </div>
+                        <button type="button" class="modal-close" id="closeStaffModal">&times;</button>
+                    </div>
+
+                    <!-- Setup Banner (Shown if no admin exists yet) -->
+                    <div id="setupBanner" class="badge-setup" style="display: none; width: 100%; justify-content: center;">
+                        <span>🔒 Setup Required: Create your Admin password below</span>
+                    </div>
+
+                    <!-- Tabs: Sign In vs Create Password -->
+                    <div class="auth-tabs" id="authTabs">
+                        <button type="button" class="auth-tab-btn active" id="tabSignIn">Sign In</button>
+                        <button type="button" class="auth-tab-btn" id="tabCreatePassword">Create Admin Password</button>
+                    </div>
+
+                    <div id="staffError" class="alert alert-danger" style="display: none;"></div>
+                    <div id="staffSuccess" class="alert alert-success" style="display: none;"></div>
+
+                    <!-- TAB 1: Sign In Form -->
+                    <form id="staffLoginForm">
+                        <div class="form-group">
+                            <label class="form-label" for="staffUsername">Username or Full Name</label>
+                            <input type="text" id="staffUsername" class="form-control" placeholder="e.g. admin" required autofocus>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="staffPassword">Password</label>
+                            <div class="password-input-wrap">
+                                <input type="password" id="staffPassword" class="form-control" placeholder="Enter your password" required>
+                                <button type="button" class="password-toggle-btn" id="toggleLoginPass" title="Show / hide password">👁️</button>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="staffSubmitBtn" class="btn btn-purple btn-block" style="margin-top: 1.25rem;">
+                            Sign In to Dashboard ➔
+                        </button>
+                    </form>
+
+                    <!-- TAB 2: Create Admin Password Form -->
+                    <form id="createPasswordForm" style="display: none;">
+                        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+                            Set up your administrator credentials to securely access the USA Tutorial Centre dashboard.
+                        </p>
+
+                        <div class="form-group">
+                            <label class="form-label" for="createFullName">Administrator Full Name</label>
+                            <input type="text" id="createFullName" class="form-control" placeholder="e.g. Eleanor Vance" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="createUsername">Choose Admin Username</label>
+                            <input type="text" id="createUsername" class="form-control" placeholder="e.g. admin" required minlength="3">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="createPassword">Create Password (Min. 6 characters)</label>
+                            <div class="password-input-wrap">
+                                <input type="password" id="createPassword" class="form-control" placeholder="Create a strong password" required minlength="6">
+                                <button type="button" class="password-toggle-btn" id="toggleCreatePass" title="Show / hide password">👁️</button>
+                            </div>
+                            <div class="password-help-text">Password must be at least 6 characters.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="createRole">Role</label>
+                            <select id="createRole" class="form-control" required>
+                                <option value="Director">Director / Principal</option>
+                                <option value="Admin">Administrator</option>
+                                <option value="Secretary">Secretary</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" id="createSubmitBtn" class="btn btn-purple btn-block" style="margin-top: 1.25rem;">
+                            Create Password & Access Dashboard ➔
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const btnStudentRole = document.getElementById("btnStudentRole");
+            const btnStaffRole = document.getElementById("btnStaffRole");
+            const studentChoiceModal = document.getElementById("studentChoiceModal");
+            const closeStudentModal = document.getElementById("closeStudentModal");
+            const staffModal = document.getElementById("staffModal");
+            const closeStaffModal = document.getElementById("closeStaffModal");
+            const staffLoginForm = document.getElementById("staffLoginForm");
+            const createPasswordForm = document.getElementById("createPasswordForm");
+            const staffError = document.getElementById("staffError");
+            const staffSuccess = document.getElementById("staffSuccess");
+            const staffSubmitBtn = document.getElementById("staffSubmitBtn");
+            const createSubmitBtn = document.getElementById("createSubmitBtn");
+            const centreNameDisplay = document.getElementById("centreNameDisplay");
+            const setupBanner = document.getElementById("setupBanner");
+
+            const tabSignIn = document.getElementById("tabSignIn");
+            const tabCreatePassword = document.getElementById("tabCreatePassword");
+            const toggleLoginPass = document.getElementById("toggleLoginPass");
+            const toggleCreatePass = document.getElementById("toggleCreatePass");
+            const staffPassword = document.getElementById("staffPassword");
+            const createPassword = document.getElementById("createPassword");
+
+            let hasAdminAccount = false;
+
+            // Password eye toggles
+            function setupPasswordToggle(btn, input) {
+                btn.addEventListener("click", () => {
+                    if (input.type === "password") {
+                        input.type = "text";
+                        btn.textContent = "🙈";
+                    } else {
+                        input.type = "password";
+                        btn.textContent = "👁️";
+                    }
+                });
+            }
+            setupPasswordToggle(toggleLoginPass, staffPassword);
+            setupPasswordToggle(toggleCreatePass, createPassword);
+
+            // Tab switching
+            function switchTab(tab) {
+                clearAlerts();
+                if (tab === "signin") {
+                    tabSignIn.classList.add("active");
+                    tabCreatePassword.classList.remove("active");
+                    staffLoginForm.style.display = "block";
+                    createPasswordForm.style.display = "none";
+                    document.getElementById("staffUsername").focus();
+                } else {
+                    tabCreatePassword.classList.add("active");
+                    tabSignIn.classList.remove("active");
+                    createPasswordForm.style.display = "block";
+                    staffLoginForm.style.display = "none";
+                    document.getElementById("createFullName").focus();
+                }
+            }
+            tabSignIn.addEventListener("click", () => switchTab("signin"));
+            tabCreatePassword.addEventListener("click", () => switchTab("create"));
+
+            function getApiUrl(endpoint) {
+                if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
+                if (window.location.port === "5000") return endpoint;
+                const host = window.location.hostname && window.location.hostname !== "" ? window.location.hostname : "127.0.0.1";
+                return `http://${host}:5000${endpoint}`;
+            }
+
+            // Check admin status
+            async function checkAdminStatus() {
+                try {
+                    const res = await fetch(getApiUrl("/api/admin/auth-status"));
+                    const data = await res.json();
+                    hasAdminAccount = data.has_admin;
+                    if (data.centre_name && centreNameDisplay) {
+                        centreNameDisplay.textContent = data.centre_name;
+                    }
+                    if (!hasAdminAccount) {
+                        setupBanner.style.display = "flex";
+                        switchTab("create");
+                    } else {
+                        setupBanner.style.display = "none";
+                        switchTab("signin");
+                    }
+                } catch (e) {
+                    console.error("Failed checking auth status:", e);
+                }
+            }
+            checkAdminStatus();
+
+            // Handle branch from QR Code scan
+            const urlParams = new URLSearchParams(window.location.search);
+            const branchParam = urlParams.get("branch");
+            if (branchParam) {
+                localStorage.setItem("tutorial_student_branch", branchParam);
+                const branchBanner = document.getElementById("branchBanner");
+                const branchBannerText = document.getElementById("branchBannerText");
+                if (branchBanner && branchBannerText) {
+                    branchBannerText.textContent = `Welcome to ${branchParam}`;
+                    branchBanner.style.display = "inline-flex";
+                }
+                const linkClockIn = document.getElementById("linkClockIn");
+                const linkClockOut = document.getElementById("linkClockOut");
+                if (linkClockIn) linkClockIn.href = `clock-in.html?branch=${encodeURIComponent(branchParam)}`;
+                if (linkClockOut) linkClockOut.href = `clock-out.html?branch=${encodeURIComponent(branchParam)}`;
+            }
+
+            function clearAlerts() {
+                staffError.style.display = "none";
+                staffSuccess.style.display = "none";
+            }
+
+            function showError(msg) {
+                staffError.textContent = msg;
+                staffError.style.display = "flex";
+                staffSuccess.style.display = "none";
+            }
+
+            function showSuccess(msg) {
+                staffSuccess.textContent = msg;
+                staffSuccess.style.display = "flex";
+                staffError.style.display = "none";
+            }
+
+            // Modals
+            btnStudentRole.addEventListener("click", () => {
+                studentChoiceModal.classList.add("open");
+            });
+
+            closeStudentModal.addEventListener("click", () => {
+                studentChoiceModal.classList.remove("open");
+            });
+
+            btnStaffRole.addEventListener("click", () => {
+                staffModal.classList.add("open");
+                clearAlerts();
+                checkAdminStatus();
+            });
+
+            closeStaffModal.addEventListener("click", () => {
+                staffModal.classList.remove("open");
+            });
+
+            // Handle Sign In with Password
+            staffLoginForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                clearAlerts();
+                const username = document.getElementById("staffUsername").value.trim();
+                const password = staffPassword.value.trim();
+
+                if (!username || !password) {
+                    showError("Please enter your username and password.");
+                    return;
+                }
+
+                staffSubmitBtn.disabled = true;
+                staffSubmitBtn.textContent = "Verifying Password...";
+
+                try {
+                    const res = await fetch(getApiUrl("/api/admin/login"), {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        sessionStorage.setItem("admin_auth_token", data.token);
+                        sessionStorage.setItem("staff_name", data.staff_name);
+                        sessionStorage.setItem("staff_role", data.staff_role);
+                        sessionStorage.setItem("admin_username", data.username || username);
+                        window.location.href = "admin.html";
+                    } else {
+                        showError(data.message || "Invalid username or password.");
+                        staffSubmitBtn.disabled = false;
+                        staffSubmitBtn.textContent = "Sign In to Dashboard ➔";
+                    }
+                } catch (err) {
+                    console.error("Login error:", err);
+                    showError("Could not connect to backend server. Ensure 'py server.py' is running on port 5000.");
+                    staffSubmitBtn.disabled = false;
+                    staffSubmitBtn.textContent = "Sign In to Dashboard ➔";
+                }
+            });
+
+            // Handle Create Admin Password
+            createPasswordForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                clearAlerts();
+                const full_name = document.getElementById("createFullName").value.trim();
+                const username = document.getElementById("createUsername").value.trim();
+                const password = createPassword.value.trim();
+                const role = document.getElementById("createRole").value.trim();
+
+                if (!full_name || !username || !password) {
+                    showError("Please complete all fields.");
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showError("Password must be at least 6 characters long.");
+                    return;
+                }
+
+                createSubmitBtn.disabled = true;
+                createSubmitBtn.textContent = "Creating Password...";
+
+                try {
+                    const res = await fetch(getApiUrl("/api/admin/create-password"), {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ full_name, username, password, role })
+                    });
+
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        showSuccess("Password created! Logging you in...");
+                        sessionStorage.setItem("admin_auth_token", data.token);
+                        sessionStorage.setItem("staff_name", data.staff_name);
+                        sessionStorage.setItem("staff_role", data.staff_role);
+                        sessionStorage.setItem("admin_username", data.username || username);
+                        setTimeout(() => {
+                            window.location.href = "admin.html";
+                        }, 800);
+                    } else {
+                        showError(data.message || "Failed to create admin password.");
+                        createSubmitBtn.disabled = false;
+                        createSubmitBtn.textContent = "Create Password & Access Dashboard ➔";
+                    }
+                } catch (err) {
+                    console.error("Create password error:", err);
+                    showError("Could not connect to backend server. Ensure 'py server.py' is running on port 5000.");
+                    createSubmitBtn.disabled = false;
+                    createSubmitBtn.textContent = "Create Password & Access Dashboard ➔";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

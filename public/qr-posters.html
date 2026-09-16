@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Branch QR Code Posters Studio | USA Tutorial Centre</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .poster-frame.poster-popoola {
+            border-color: #2563eb;
+        }
+        .poster-frame.poster-popoola .poster-top-banner {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+        .poster-frame.poster-popoola .poster-main-action {
+            color: #1d4ed8;
+        }
+
+        .poster-frame.poster-kilimanjaro {
+            border-color: #7c3aed;
+        }
+        .poster-frame.poster-kilimanjaro .poster-top-banner {
+            background: #f5f3ff;
+            color: #6d28d9;
+            border: 1px solid #ddd6fe;
+        }
+        .poster-frame.poster-kilimanjaro .poster-main-action {
+            color: #6d28d9;
+        }
+
+        .daily-token-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-top: 0.5rem;
+            padding: 0.3rem 0.85rem;
+            border-radius: 9999px;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 700;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header (Hidden when printing) -->
+        <header class="header-nav no-print">
+            <a href="index.html" class="brand">
+                <img src="images/logo.png" alt="USA Tutorial Centre" class="brand-logo-img">
+                <div class="brand-info">
+                    <h1 id="studioCentreHeader">USA Tutorial Centre</h1>
+                    <span>Official Branch Attendance QR Studio</span>
+                </div>
+            </a>
+            <nav class="nav-links">
+                <a href="admin.html" class="nav-link" style="color: var(--purple-700); font-weight: 600;">Admin Dashboard</a>
+                <a href="clock-in.html" class="nav-link" style="color: var(--blue-600);">Clock In</a>
+                <a href="clock-out.html" class="nav-link" style="color: var(--red-600);">Clock Out</a>
+                <a href="index.html" class="nav-link">Main Portal</a>
+            </nav>
+        </header>
+
+        <!-- Studio Controls (Hidden when printing) -->
+        <section class="clean-card no-print" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+                <div>
+                    <h2 style="font-family: var(--font-heading); font-size: 1.35rem; color: var(--text-main); margin-bottom: 0.2rem;">
+                        Dual Branch Posters & Daily QR Refresh Studio
+                    </h2>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        Print these official posters for <strong>Popoola Branch</strong> and <strong>Kilimanjaro Branch</strong>. When scanned by students, both QR codes open the <strong>Main Portal</strong> with their branch recognized.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button type="button" id="refreshQrBtn" class="btn btn-outline" style="font-size: 0.95rem; padding: 0.7rem 1.2rem; color: var(--purple-700); border-color: var(--purple-300);">
+                        <span>🔄 Refresh Daily QR Codes</span>
+                    </button>
+                    <button type="button" id="printBtn" class="btn btn-primary" style="font-size: 0.95rem; padding: 0.7rem 1.4rem;">
+                        <span>🖨️ Print Both Posters (A4)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="centreNameInput">Tutorial Centre Name</label>
+                    <input type="text" id="centreNameInput" class="form-control" placeholder="USA Tutorial Centre" value="USA Tutorial Centre">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="baseUrlInput">Base URL (Local Network IP or Domain)</label>
+                    <input type="text" id="baseUrlInput" class="form-control" placeholder="http://192.168.1.50:5000">
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.82rem; color: var(--text-muted);">
+                <div id="tokenStatusText">
+                    🔑 Active Daily Token: <strong id="activeTokenDisplay">Loading...</strong>
+                </div>
+                <button type="button" id="regenerateBtn" class="btn btn-outline btn-sm">
+                    Re-render Posters
+                </button>
+            </div>
+        </section>
+
+        <!-- Printable Posters Grid -->
+        <main class="posters-preview-grid">
+            <!-- ================= POPOOLA BRANCH POSTER ================= -->
+            <div class="poster-frame poster-popoola">
+                <div>
+                    <img src="images/logo.png" alt="USA Tutorial Centre Logo" class="poster-logo">
+                    <div class="poster-top-banner">📍 POPOOLA BRANCH • OFFICIAL ATTENDANCE</div>
+                    <div class="poster-centre-title" id="popoolaPosterTitle">USA Tutorial Centre</div>
+                    <div style="font-size: 1.15rem; font-weight: 700; color: #1e3a8a; margin-bottom: 0.25rem;">POPOOLA BRANCH</div>
+                    <div class="poster-main-action">SCAN TO ACCESS PORTAL</div>
+                </div>
+
+                <div class="poster-qr-container">
+                    <div id="popoolaQrContainer"></div>
+                </div>
+
+                <div>
+                    <div class="poster-instructions">
+                        📱 Point your phone camera at this QR code to access the main portal, clock-in, or clock-out.
+                    </div>
+                    <div class="daily-token-tag" id="popoolaTokenTag">
+                        <span>🗓️</span> <span id="popoolaTokenText">Pass: Loading...</span>
+                    </div>
+                    <div class="poster-url-hint" id="popoolaUrlHint">http://.../index.html?branch=Popoola+Branch</div>
+                </div>
+            </div>
+
+            <!-- ================= KILIMANJARO BRANCH POSTER ================= -->
+            <div class="poster-frame poster-kilimanjaro">
+                <div>
+                    <img src="images/logo.png" alt="USA Tutorial Centre Logo" class="poster-logo">
+                    <div class="poster-top-banner">📍 KILIMANJARO BRANCH • OFFICIAL ATTENDANCE</div>
+                    <div class="poster-centre-title" id="kilimanjaroPosterTitle">USA Tutorial Centre</div>
+                    <div style="font-size: 1.15rem; font-weight: 700; color: #581c87; margin-bottom: 0.25rem;">KILIMANJARO BRANCH</div>
+                    <div class="poster-main-action">SCAN TO ACCESS PORTAL</div>
+                </div>
+
+                <div class="poster-qr-container">
+                    <div id="kilimanjaroQrContainer"></div>
+                </div>
+
+                <div>
+                    <div class="poster-instructions">
+                        📱 Point your phone camera at this QR code to access the main portal, clock-in, or clock-out.
+                    </div>
+                    <div class="daily-token-tag" id="kilimanjaroTokenTag">
+                        <span>🗓️</span> <span id="kilimanjaroTokenText">Pass: Loading...</span>
+                    </div>
+                    <div class="poster-url-hint" id="kilimanjaroUrlHint">http://.../index.html?branch=Kilimanjaro+Branch</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/qrcode.min.js"></script>
+    <script src="js/qr-posters.js"></script>
+</body>
+</html>

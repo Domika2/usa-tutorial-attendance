@@ -1,0 +1,3 @@
+# USA Tutorial Centre Attendance System
+# This application runs on the Python standard library (http.server, sqlite3, socketserver).
+# No external pip dependencies are required.
