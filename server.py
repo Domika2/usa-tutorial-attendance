@@ -214,9 +214,13 @@ class AttendanceHandler(http.server.BaseHTTPRequestHandler):
                 elif path == "/api/admin/qr-info":
                     qr_info = database.get_qr_info()
                     base_url = self.get_base_url()
+                    token = qr_info['token']
                     qr_info["base_url"] = base_url
-                    qr_info["popoola_url"] = f"{base_url}/index.html?branch=Popoola+Branch&token={qr_info['token']}"
-                    qr_info["kilimanjaro_url"] = f"{base_url}/index.html?branch=Kilimanjaro+Branch&token={qr_info['token']}"
+                    qr_info["popoola_url"] = f"{base_url}/clock-in.html?branch=Popoola+Branch&attendance_token={token}"
+                    qr_info["kilimanjaro_url"] = f"{base_url}/clock-in.html?branch=Kilimanjaro+Branch&attendance_token={token}"
+                    qr_info["direct_clock_in_url"] = f"{base_url}/clock-in.html?attendance_token={token}"
+                    qr_info["direct_clock_out_url"] = f"{base_url}/clock-out.html?attendance_token={token}"
+                    qr_info["main_portal_url"] = f"{base_url}/index.html?attendance_token={token}"
                     self.send_json(qr_info)
                     return
 
@@ -336,6 +340,14 @@ class AttendanceHandler(http.server.BaseHTTPRequestHandler):
                 parent_phone = data.get("parent_phone", "").strip()
                 session_type = data.get("session_type", "Morning Session").strip()
                 notes = data.get("notes", "").strip()
+                attendance_token = (data.get("attendance_token") or data.get("token") or
+                                   query_params.get("attendance_token", [""])[0] or
+                                   query_params.get("token", [""])[0]).strip()
+
+                # Static token validation (Permanent 24/7 validity - no dynamic/short-lived expiration)
+                if attendance_token and not database.verify_attendance_token(attendance_token):
+                    self.send_json({"success": False, "message": "Invalid attendance QR token."}, 400)
+                    return
 
                 if not name or not email:
                     self.send_json({"success": False, "message": "Full Name and Email address are required."}, 400)
@@ -345,7 +357,7 @@ class AttendanceHandler(http.server.BaseHTTPRequestHandler):
                     self.send_json({"success": False, "message": "Tutorial Branch is required."}, 400)
                     return
 
-                if branch not in ["Popoola Branch", "Kilimanjaro Branch"]:
+                if not branch:
                     branch = "Popoola Branch"
 
                 if "@" not in email or "." not in email:
@@ -353,16 +365,13 @@ class AttendanceHandler(http.server.BaseHTTPRequestHandler):
                     return
 
                 if not call_number:
-                    self.send_json({"success": False, "message": "Student's Call Number is required."}, 400)
-                    return
+                    call_number = "08000000000"
 
                 if not whatsapp_number:
-                    self.send_json({"success": False, "message": "Student's WhatsApp Number is required."}, 400)
-                    return
+                    whatsapp_number = call_number
 
                 if not parent_phone:
-                    self.send_json({"success": False, "message": "Parent's Phone Number is required."}, 400)
-                    return
+                    parent_phone = "08000000000"
 
                 if session_type not in ["Morning Session", "Evening Session", "Both Sessions"]:
                     session_type = "Morning Session"
@@ -379,6 +388,14 @@ class AttendanceHandler(http.server.BaseHTTPRequestHandler):
                 email = data.get("email", "").strip()
                 branch = data.get("branch", "Popoola Branch").strip()
                 session_type = data.get("session_type", "").strip()
+                attendance_token = (data.get("attendance_token") or data.get("token") or
+                                   query_params.get("attendance_token", [""])[0] or
+                                   query_params.get("token", [""])[0]).strip()
+
+                # Static token validation (Permanent 24/7 validity - no dynamic/short-lived expiration)
+                if attendance_token and not database.verify_attendance_token(attendance_token):
+                    self.send_json({"success": False, "message": "Invalid attendance QR token."}, 400)
+                    return
 
                 if not email:
                     self.send_json({"success": False, "message": "Email address is required."}, 400)
@@ -600,12 +617,15 @@ class AttendanceHandler(http.server.BaseHTTPRequestHandler):
                     return
                 qr_info = database.refresh_qr_token()
                 base_url = self.get_base_url()
+                token = qr_info['token']
                 qr_info["base_url"] = base_url
-                qr_info["popoola_url"] = f"{base_url}/index.html?branch=Popoola+Branch&token={qr_info['token']}"
-                qr_info["kilimanjaro_url"] = f"{base_url}/index.html?branch=Kilimanjaro+Branch&token={qr_info['token']}"
+                qr_info["popoola_url"] = f"{base_url}/clock-in.html?branch=Popoola+Branch&attendance_token={token}"
+                qr_info["kilimanjaro_url"] = f"{base_url}/clock-in.html?branch=Kilimanjaro+Branch&attendance_token={token}"
+                qr_info["direct_clock_in_url"] = f"{base_url}/clock-in.html?attendance_token={token}"
+                qr_info["direct_clock_out_url"] = f"{base_url}/clock-out.html?attendance_token={token}"
                 self.send_json({
                     "success": True,
-                    "message": "Daily QR codes refreshed successfully.",
+                    "message": "Permanent 24/7 QR code info active.",
                     "qr_info": qr_info
                 }, 200)
                 return

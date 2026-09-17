@@ -147,7 +147,9 @@ def init_db():
     cursor.execute("INSERT OR IGNORE INTO admin_config (key, value) VALUES ('centre_name', 'USA Tutorial Centre')")
     cursor.execute("UPDATE admin_config SET value = 'USA Tutorial Centre' WHERE key = 'centre_name'")
     cursor.execute("INSERT OR IGNORE INTO admin_config (key, value) VALUES ('session_token', 'admin_secret_token_2026')")
-    cursor.execute("INSERT OR IGNORE INTO admin_config (key, value) VALUES ('qr_refresh_token', 'daily_qr_token_default')")
+    cursor.execute("INSERT OR IGNORE INTO admin_config (key, value) VALUES ('qr_permanent_token', 'PERMANENT_SESSION_KEY')")
+    cursor.execute("UPDATE admin_config SET value = 'PERMANENT_SESSION_KEY' WHERE key = 'qr_permanent_token'")
+    cursor.execute("INSERT OR IGNORE INTO admin_config (key, value) VALUES ('qr_refresh_token', 'PERMANENT_SESSION_KEY')")
     cursor.execute("INSERT OR IGNORE INTO admin_config (key, value) VALUES ('qr_refresh_date', '')")
     cursor.execute("INSERT OR IGNORE INTO admin_config (key, value) VALUES ('qr_refresh_time', '')")
 
@@ -332,7 +334,7 @@ def clock_in_student(name, email, branch="Popoola Branch", notes="", call_number
     name = name.strip()
     email = email.strip().lower()
     branch = (branch or "Popoola Branch").strip()
-    if branch not in ("Popoola Branch", "Kilimanjaro Branch"):
+    if not branch:
         branch = "Popoola Branch"
 
     if session_type not in ("Morning Session", "Evening Session", "Both Sessions"):
@@ -809,6 +811,8 @@ def acknowledge_absentee_alert(email, session_type="Morning Session", date_str=N
     conn.close()
     return {"success": True, "message": "Alert acknowledged and cleared from dashboard."}
 
+PERMANENT_ATTENDANCE_TOKEN = "PERMANENT_SESSION_KEY"
+
 def refresh_qr_token():
     now_epoch = int(time.time())
     today_str = format_date_str(now_epoch)
@@ -819,21 +823,44 @@ def refresh_qr_token():
     set_config("qr_refresh_time", now_time_str)
     return {
         "token": token,
+        "permanent_token": PERMANENT_ATTENDANCE_TOKEN,
+        "is_permanent": True,
+        "validity": "24/7 Indefinite",
         "date": today_str,
         "time": now_time_str,
         "branches": ["Popoola Branch", "Kilimanjaro Branch"]
     }
 
 def get_qr_info():
-    token = get_config("qr_refresh_token", "daily_qr_token_default")
-    date_str = get_config("qr_refresh_date", format_date_str(int(time.time())))
-    time_str = get_config("qr_refresh_time", format_time_12h(int(time.time())))
+    token = get_config("qr_permanent_token", PERMANENT_ATTENDANCE_TOKEN)
     return {
         "token": token,
-        "date": date_str,
-        "time": time_str,
+        "is_permanent": True,
+        "validity": "24/7 Indefinite",
+        "date": "Permanent",
+        "time": "24/7 Active",
         "branches": ["Popoola Branch", "Kilimanjaro Branch"]
     }
+
+def verify_attendance_token(token):
+    """
+    Validates attendance token statically without any time-window or short-lived expiration.
+    Returns True if valid or omitted (for backwards compatibility).
+    """
+    if not token:
+        return True
+    token_str = str(token).strip()
+    permanent_token = get_config("qr_permanent_token", PERMANENT_ATTENDANCE_TOKEN)
+    refresh_token = get_config("qr_refresh_token", PERMANENT_ATTENDANCE_TOKEN)
+    allowed = {
+        permanent_token,
+        PERMANENT_ATTENDANCE_TOKEN,
+        refresh_token,
+        "PERMANENT_SESSION_KEY",
+        "daily_qr_token_default",
+        "daily_qr_token"
+    }
+    return token_str in allowed
 
 def get_all_students(branch_filter="ALL"):
     conn = get_db()

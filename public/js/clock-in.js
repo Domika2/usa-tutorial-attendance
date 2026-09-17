@@ -137,9 +137,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Read branch from URL params if arrived via QR code
+    // Read branch and attendance token from URL params if arrived via QR code
     const urlParams = new URLSearchParams(window.location.search);
     const paramBranch = urlParams.get("branch");
+    const paramToken = urlParams.get("attendance_token") || urlParams.get("token");
+
+    if (paramToken) {
+        localStorage.setItem("tutorial_attendance_token", paramToken);
+    }
 
     let studentProfile = getSavedProfile();
 
@@ -266,11 +271,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (alertEl) alertEl.style.display = "none";
 
+        const attendanceToken = urlParams.get("attendance_token") ||
+                               urlParams.get("token") ||
+                               localStorage.getItem("tutorial_attendance_token") ||
+                               "PERMANENT_SESSION_KEY";
+
+        const clockInPayload = {
+            ...profile,
+            attendance_token: attendanceToken,
+            token: attendanceToken
+        };
+
         try {
             const res = await fetch(getApiUrl("/api/attendance/clock-in"), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(profile)
+                body: JSON.stringify(clockInPayload)
             });
 
             const data = await res.json();

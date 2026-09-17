@@ -257,9 +257,15 @@
             }
             checkAdminStatus();
 
-            // Handle branch from QR Code scan
+            // Handle branch and token from QR Code scan
             const urlParams = new URLSearchParams(window.location.search);
             const branchParam = urlParams.get("branch");
+            const tokenParam = urlParams.get("attendance_token") || urlParams.get("token");
+
+            if (tokenParam) {
+                localStorage.setItem("tutorial_attendance_token", tokenParam);
+            }
+
             if (branchParam) {
                 localStorage.setItem("tutorial_student_branch", branchParam);
                 const branchBanner = document.getElementById("branchBanner");
@@ -268,10 +274,18 @@
                     branchBannerText.textContent = `Welcome to ${branchParam}`;
                     branchBanner.style.display = "inline-flex";
                 }
-                const linkClockIn = document.getElementById("linkClockIn");
-                const linkClockOut = document.getElementById("linkClockOut");
-                if (linkClockIn) linkClockIn.href = `clock-in.html?branch=${encodeURIComponent(branchParam)}`;
-                if (linkClockOut) linkClockOut.href = `clock-out.html?branch=${encodeURIComponent(branchParam)}`;
+            }
+
+            const tokenQuery = tokenParam ? `&attendance_token=${encodeURIComponent(tokenParam)}` : '';
+            const linkClockIn = document.getElementById("linkClockIn");
+            const linkClockOut = document.getElementById("linkClockOut");
+            if (linkClockIn) {
+                const bParam = branchParam ? `branch=${encodeURIComponent(branchParam)}` : '';
+                linkClockIn.href = `clock-in.html${bParam || tokenParam ? '?' : ''}${bParam}${bParam && tokenParam ? '&' : ''}${tokenParam ? 'attendance_token=' + encodeURIComponent(tokenParam) : ''}`;
+            }
+            if (linkClockOut) {
+                const bParam = branchParam ? `branch=${encodeURIComponent(branchParam)}` : '';
+                linkClockOut.href = `clock-out.html${bParam || tokenParam ? '?' : ''}${bParam}${bParam && tokenParam ? '&' : ''}${tokenParam ? 'attendance_token=' + encodeURIComponent(tokenParam) : ''}`;
             }
 
             function clearAlerts() {

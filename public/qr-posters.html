@@ -3,10 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Branch QR Code Posters Studio | USA Tutorial Centre</title>
+    <title>Permanent 24/7 Attendance QR Studio | USA Tutorial Centre</title>
     <link rel="icon" type="image/png" href="images/logo.png">
     <link rel="stylesheet" href="css/style.css">
     <style>
+        .poster-frame.poster-single {
+            border-color: #0f766e;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+        .poster-frame.poster-single .poster-top-banner {
+            background: #f0fdfa;
+            color: #0f766e;
+            border: 1px solid #99f6e4;
+        }
+        .poster-frame.poster-single .poster-main-action {
+            color: #0f766e;
+        }
+
         .poster-frame.poster-popoola {
             border-color: #2563eb;
         }
@@ -31,19 +45,61 @@
             color: #6d28d9;
         }
 
-        .daily-token-tag {
+        .permanent-token-tag {
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
             margin-top: 0.5rem;
-            padding: 0.3rem 0.85rem;
+            padding: 0.35rem 0.95rem;
             border-radius: 9999px;
             font-family: var(--font-mono);
             font-size: 0.78rem;
             font-weight: 700;
             background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            color: #334155;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+        }
+
+        .posters-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .posters-preview-grid.single-view {
+            display: flex;
+            justify-content: center;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+            .app-container {
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            .posters-preview-grid {
+                display: block !important;
+            }
+            .poster-frame {
+                page-break-inside: avoid;
+                page-break-after: auto;
+                box-shadow: none !important;
+                border: 2px solid #000 !important;
+                margin: 0 auto 2rem auto !important;
+                max-width: 100% !important;
+                width: 90% !important;
+                padding: 2.5rem !important;
+            }
+            .poster-frame.hidden-for-print {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -55,7 +111,7 @@
                 <img src="images/logo.png" alt="USA Tutorial Centre" class="brand-logo-img">
                 <div class="brand-info">
                     <h1 id="studioCentreHeader">USA Tutorial Centre</h1>
-                    <span>Official Branch Attendance QR Studio</span>
+                    <span>Official 24/7 Attendance QR Studio</span>
                 </div>
             </a>
             <nav class="nav-links">
@@ -71,23 +127,29 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
                 <div>
                     <h2 style="font-family: var(--font-heading); font-size: 1.35rem; color: var(--text-main); margin-bottom: 0.2rem;">
-                        Dual Branch Posters & Daily QR Refresh Studio
+                        Permanent 24/7 Attendance QR Studio
                     </h2>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">
-                        Print these official posters for <strong>Popoola Branch</strong> and <strong>Kilimanjaro Branch</strong>. When scanned by students, both QR codes open the <strong>Main Portal</strong> with their branch recognized.
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;">
+                        Print official attendance posters. These QR codes use a permanent 24/7 payload that remains valid indefinitely without expiration or daily re-printing.
                     </p>
                 </div>
                 <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                    <button type="button" id="refreshQrBtn" class="btn btn-outline" style="font-size: 0.95rem; padding: 0.7rem 1.2rem; color: var(--purple-700); border-color: var(--purple-300);">
-                        <span>🔄 Refresh Daily QR Codes</span>
-                    </button>
                     <button type="button" id="printBtn" class="btn btn-primary" style="font-size: 0.95rem; padding: 0.7rem 1.4rem;">
-                        <span>🖨️ Print Both Posters (A4)</span>
+                        <span>🖨️ Print Selected Poster (A4)</span>
                     </button>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="posterSelect">Poster Format</label>
+                    <select id="posterSelect" class="form-control" style="font-weight: 600;">
+                        <option value="single" selected>Single Official 24/7 Attendance Poster (Direct Clock-In)</option>
+                        <option value="popoola">Popoola Branch Poster (24/7 Permanent)</option>
+                        <option value="kilimanjaro">Kilimanjaro Branch Poster (24/7 Permanent)</option>
+                        <option value="all">All Branch Posters (Dual Branch Side-by-Side)</option>
+                    </select>
+                </div>
                 <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label" for="centreNameInput">Tutorial Centre Name</label>
                     <input type="text" id="centreNameInput" class="form-control" placeholder="USA Tutorial Centre" value="USA Tutorial Centre">
@@ -98,26 +160,51 @@
                 </div>
             </div>
 
-            <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.82rem; color: var(--text-muted);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.82rem; color: var(--text-muted); padding-top: 0.75rem; border-top: 1px solid var(--border-light);">
                 <div id="tokenStatusText">
-                    🔑 Active Daily Token: <strong id="activeTokenDisplay">Loading...</strong>
+                    🔒 Permanent Key: <strong id="activeTokenDisplay" style="color: var(--teal-700);">PERMANENT_SESSION_KEY</strong> (Active 24/7 • Indefinite Validity)
                 </div>
                 <button type="button" id="regenerateBtn" class="btn btn-outline btn-sm">
-                    Re-render Posters
+                    Re-render QR Codes
                 </button>
             </div>
         </section>
 
         <!-- Printable Posters Grid -->
-        <main class="posters-preview-grid">
+        <main class="posters-preview-grid single-view" id="postersContainer">
+            <!-- ================= SINGLE 24/7 OFFICIAL ATTENDANCE POSTER ================= -->
+            <div class="poster-frame poster-single" id="singlePosterFrame">
+                <div>
+                    <img src="images/logo.png" alt="USA Tutorial Centre Logo" class="poster-logo">
+                    <div class="poster-top-banner">📍 OFFICIAL ATTENDANCE • 24/7 PERMANENT QR</div>
+                    <div class="poster-centre-title" id="singlePosterTitle">USA Tutorial Centre</div>
+                    <div style="font-size: 1.15rem; font-weight: 700; color: #0f766e; margin-bottom: 0.25rem;">STUDENT ATTENDANCE PORTAL</div>
+                    <div class="poster-main-action">SCAN TO CLOCK IN / CLOCK OUT</div>
+                </div>
+
+                <div class="poster-qr-container">
+                    <div id="singleQrContainer"></div>
+                </div>
+
+                <div>
+                    <div class="poster-instructions">
+                        📱 Point your phone camera at this QR code to clock in upon arrival or clock out upon departure.
+                    </div>
+                    <div class="permanent-token-tag" id="singleTokenTag">
+                        <span>♾️</span> <span id="singleTokenText">Valid 24/7 • Permanent Session Key</span>
+                    </div>
+                    <div class="poster-url-hint" id="singleUrlHint">http://.../clock-in.html?attendance_token=PERMANENT_SESSION_KEY</div>
+                </div>
+            </div>
+
             <!-- ================= POPOOLA BRANCH POSTER ================= -->
-            <div class="poster-frame poster-popoola">
+            <div class="poster-frame poster-popoola" id="popoolaPosterFrame" style="display: none;">
                 <div>
                     <img src="images/logo.png" alt="USA Tutorial Centre Logo" class="poster-logo">
                     <div class="poster-top-banner">📍 POPOOLA BRANCH • OFFICIAL ATTENDANCE</div>
                     <div class="poster-centre-title" id="popoolaPosterTitle">USA Tutorial Centre</div>
                     <div style="font-size: 1.15rem; font-weight: 700; color: #1e3a8a; margin-bottom: 0.25rem;">POPOOLA BRANCH</div>
-                    <div class="poster-main-action">SCAN TO ACCESS PORTAL</div>
+                    <div class="poster-main-action">SCAN TO CLOCK IN / CLOCK OUT</div>
                 </div>
 
                 <div class="poster-qr-container">
@@ -126,23 +213,23 @@
 
                 <div>
                     <div class="poster-instructions">
-                        📱 Point your phone camera at this QR code to access the main portal, clock-in, or clock-out.
+                        📱 Point your phone camera at this QR code to clock in or clock out at Popoola Branch.
                     </div>
-                    <div class="daily-token-tag" id="popoolaTokenTag">
-                        <span>🗓️</span> <span id="popoolaTokenText">Pass: Loading...</span>
+                    <div class="permanent-token-tag" id="popoolaTokenTag">
+                        <span>♾️</span> <span id="popoolaTokenText">Popoola Branch • Permanent 24/7 Pass</span>
                     </div>
-                    <div class="poster-url-hint" id="popoolaUrlHint">http://.../index.html?branch=Popoola+Branch</div>
+                    <div class="poster-url-hint" id="popoolaUrlHint">http://.../clock-in.html?branch=Popoola+Branch&attendance_token=PERMANENT_SESSION_KEY</div>
                 </div>
             </div>
 
             <!-- ================= KILIMANJARO BRANCH POSTER ================= -->
-            <div class="poster-frame poster-kilimanjaro">
+            <div class="poster-frame poster-kilimanjaro" id="kilimanjaroPosterFrame" style="display: none;">
                 <div>
                     <img src="images/logo.png" alt="USA Tutorial Centre Logo" class="poster-logo">
                     <div class="poster-top-banner">📍 KILIMANJARO BRANCH • OFFICIAL ATTENDANCE</div>
                     <div class="poster-centre-title" id="kilimanjaroPosterTitle">USA Tutorial Centre</div>
                     <div style="font-size: 1.15rem; font-weight: 700; color: #581c87; margin-bottom: 0.25rem;">KILIMANJARO BRANCH</div>
-                    <div class="poster-main-action">SCAN TO ACCESS PORTAL</div>
+                    <div class="poster-main-action">SCAN TO CLOCK IN / CLOCK OUT</div>
                 </div>
 
                 <div class="poster-qr-container">
@@ -151,12 +238,12 @@
 
                 <div>
                     <div class="poster-instructions">
-                        📱 Point your phone camera at this QR code to access the main portal, clock-in, or clock-out.
+                        📱 Point your phone camera at this QR code to clock in or clock out at Kilimanjaro Branch.
                     </div>
-                    <div class="daily-token-tag" id="kilimanjaroTokenTag">
-                        <span>🗓️</span> <span id="kilimanjaroTokenText">Pass: Loading...</span>
+                    <div class="permanent-token-tag" id="kilimanjaroTokenTag">
+                        <span>♾️</span> <span id="kilimanjaroTokenText">Kilimanjaro Branch • Permanent 24/7 Pass</span>
                     </div>
-                    <div class="poster-url-hint" id="kilimanjaroUrlHint">http://.../index.html?branch=Kilimanjaro+Branch</div>
+                    <div class="poster-url-hint" id="kilimanjaroUrlHint">http://.../clock-in.html?branch=Kilimanjaro+Branch&attendance_token=PERMANENT_SESSION_KEY</div>
                 </div>
             </div>
         </main>

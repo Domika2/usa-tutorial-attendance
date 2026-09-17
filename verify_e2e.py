@@ -1,6 +1,14 @@
+import os
+os.environ['no_proxy'] = '*'
+os.environ['NO_PROXY'] = '*'
+for k in ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY']:
+    os.environ.pop(k, None)
+
 import urllib.request
 import json
 import time
+
+urllib.request.install_opener(urllib.request.build_opener(urllib.request.ProxyHandler({})))
 
 BASE_URL = "http://127.0.0.1:5000"
 
