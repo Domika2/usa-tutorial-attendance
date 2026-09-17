@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="icon" type="image/png" href="images/logo.png">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <div class="app-container" style="justify-content: center; min-height: 90vh;">
         <!-- Header -->
@@ -18,9 +20,9 @@
                     <span>Attendance & Management Portal</span>
                 </div>
             </div>
-            <nav class="nav-links">
+            <!-- <nav class="nav-links">
                 <a href="qr-posters.html" class="nav-link">QR Posters 🖨️</a>
-            </nav>
+            </nav> -->
         </header>
 
         <!-- Main Role Selection Screen -->
@@ -29,7 +31,8 @@
                 <img src="images/logo.png" alt="USA Tutorial Centre" class="brand-logo-lg">
                 <h2 class="page-title" style="font-size: 1.85rem;">USA Tutorial Centre</h2>
                 <p class="page-subtitle">Unique Success Academy • Please select your portal to proceed</p>
-                <div id="branchBanner" style="display: none; margin-top: 0.75rem; padding: 0.4rem 1.1rem; border-radius: 9999px; background: var(--blue-50); color: var(--blue-700); font-weight: 600; font-size: 0.88rem; border: 1px solid var(--blue-200); align-items: center; justify-content: center; gap: 0.4rem;">
+                <div id="branchBanner"
+                    style="display: none; margin-top: 0.75rem; padding: 0.4rem 1.1rem; border-radius: 9999px; background: var(--blue-50); color: var(--blue-700); font-weight: 600; font-size: 0.88rem; border: 1px solid var(--blue-200); align-items: center; justify-content: center; gap: 0.4rem;">
                     <span>📍</span> <span id="branchBannerText">Popoola Branch</span>
                 </div>
             </div>
@@ -71,10 +74,12 @@
                         Are you arriving at USA Tutorial Centre or heading home?
                     </p>
                     <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-                        <a href="clock-in.html" id="linkClockIn" class="btn btn-clockin btn-block" style="font-size: 1rem; padding: 0.85rem;">
+                        <a href="clock-in.html" id="linkClockIn" class="btn btn-clockin btn-block"
+                            style="font-size: 1rem; padding: 0.85rem;">
                             🟢 Clock In (Arrival)
                         </a>
-                        <a href="clock-out.html" id="linkClockOut" class="btn btn-clockout btn-block" style="font-size: 1rem; padding: 0.85rem;">
+                        <a href="clock-out.html" id="linkClockOut" class="btn btn-clockout btn-block"
+                            style="font-size: 1rem; padding: 0.85rem;">
                             🔴 Clock Out (Departure)
                         </a>
                     </div>
@@ -86,14 +91,17 @@
                 <div class="modal-content" style="text-align: left;">
                     <div class="modal-header">
                         <div style="display: flex; align-items: center; gap: 0.65rem;">
-                            <img src="images/logo.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
-                            <h3 class="modal-title" style="color: var(--purple-800); font-size: 1.15rem;">Admin Access</h3>
+                            <img src="images/logo.png" alt="Logo"
+                                style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                            <h3 class="modal-title" style="color: var(--purple-800); font-size: 1.15rem;">Admin Access
+                            </h3>
                         </div>
                         <button type="button" class="modal-close" id="closeStaffModal">&times;</button>
                     </div>
 
                     <!-- Setup Banner (Shown if no admin exists yet) -->
-                    <div id="setupBanner" class="badge-setup" style="display: none; width: 100%; justify-content: center;">
+                    <div id="setupBanner" class="badge-setup"
+                        style="display: none; width: 100%; justify-content: center;">
                         <span>🔒 Setup Required: Create your Admin password below</span>
                     </div>
 
@@ -110,18 +118,22 @@
                     <form id="staffLoginForm">
                         <div class="form-group">
                             <label class="form-label" for="staffUsername">Username or Full Name</label>
-                            <input type="text" id="staffUsername" class="form-control" placeholder="e.g. admin" required autofocus>
+                            <input type="text" id="staffUsername" class="form-control" placeholder="e.g. admin" required
+                                autofocus>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label" for="staffPassword">Password</label>
                             <div class="password-input-wrap">
-                                <input type="password" id="staffPassword" class="form-control" placeholder="Enter your password" required>
-                                <button type="button" class="password-toggle-btn" id="toggleLoginPass" title="Show / hide password">👁️</button>
+                                <input type="password" id="staffPassword" class="form-control"
+                                    placeholder="Enter your password" required>
+                                <button type="button" class="password-toggle-btn" id="toggleLoginPass"
+                                    title="Show / hide password">👁️</button>
                             </div>
                         </div>
 
-                        <button type="submit" id="staffSubmitBtn" class="btn btn-purple btn-block" style="margin-top: 1.25rem;">
+                        <button type="submit" id="staffSubmitBtn" class="btn btn-purple btn-block"
+                            style="margin-top: 1.25rem;">
                             Sign In to Dashboard ➔
                         </button>
                     </form>
@@ -134,19 +146,23 @@
 
                         <div class="form-group">
                             <label class="form-label" for="createFullName">Administrator Full Name</label>
-                            <input type="text" id="createFullName" class="form-control" placeholder="e.g. Eleanor Vance" required>
+                            <input type="text" id="createFullName" class="form-control" placeholder="e.g. Eleanor Vance"
+                                required>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label" for="createUsername">Choose Admin Username</label>
-                            <input type="text" id="createUsername" class="form-control" placeholder="e.g. admin" required minlength="3">
+                            <input type="text" id="createUsername" class="form-control" placeholder="e.g. admin"
+                                required minlength="3">
                         </div>
 
                         <div class="form-group">
                             <label class="form-label" for="createPassword">Create Password (Min. 6 characters)</label>
                             <div class="password-input-wrap">
-                                <input type="password" id="createPassword" class="form-control" placeholder="Create a strong password" required minlength="6">
-                                <button type="button" class="password-toggle-btn" id="toggleCreatePass" title="Show / hide password">👁️</button>
+                                <input type="password" id="createPassword" class="form-control"
+                                    placeholder="Create a strong password" required minlength="6">
+                                <button type="button" class="password-toggle-btn" id="toggleCreatePass"
+                                    title="Show / hide password">👁️</button>
                             </div>
                             <div class="password-help-text">Password must be at least 6 characters.</div>
                         </div>
@@ -160,7 +176,8 @@
                             </select>
                         </div>
 
-                        <button type="submit" id="createSubmitBtn" class="btn btn-purple btn-block" style="margin-top: 1.25rem;">
+                        <button type="submit" id="createSubmitBtn" class="btn btn-purple btn-block"
+                            style="margin-top: 1.25rem;">
                             Create Password & Access Dashboard ➔
                         </button>
                     </form>
@@ -232,7 +249,9 @@
 
             function getApiUrl(endpoint) {
                 if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
-                return endpoint;
+                if (window.location.port === "5000") return endpoint;
+                const host = window.location.hostname && window.location.hostname !== "" ? window.location.hostname : "127.0.0.1";
+                return `http://${host}:5000${endpoint}`;
             }
 
             // Check admin status
@@ -257,15 +276,9 @@
             }
             checkAdminStatus();
 
-            // Handle branch and token from QR Code scan
+            // Handle branch from QR Code scan
             const urlParams = new URLSearchParams(window.location.search);
             const branchParam = urlParams.get("branch");
-            const tokenParam = urlParams.get("attendance_token") || urlParams.get("token");
-
-            if (tokenParam) {
-                localStorage.setItem("tutorial_attendance_token", tokenParam);
-            }
-
             if (branchParam) {
                 localStorage.setItem("tutorial_student_branch", branchParam);
                 const branchBanner = document.getElementById("branchBanner");
@@ -274,18 +287,10 @@
                     branchBannerText.textContent = `Welcome to ${branchParam}`;
                     branchBanner.style.display = "inline-flex";
                 }
-            }
-
-            const tokenQuery = tokenParam ? `&attendance_token=${encodeURIComponent(tokenParam)}` : '';
-            const linkClockIn = document.getElementById("linkClockIn");
-            const linkClockOut = document.getElementById("linkClockOut");
-            if (linkClockIn) {
-                const bParam = branchParam ? `branch=${encodeURIComponent(branchParam)}` : '';
-                linkClockIn.href = `clock-in.html${bParam || tokenParam ? '?' : ''}${bParam}${bParam && tokenParam ? '&' : ''}${tokenParam ? 'attendance_token=' + encodeURIComponent(tokenParam) : ''}`;
-            }
-            if (linkClockOut) {
-                const bParam = branchParam ? `branch=${encodeURIComponent(branchParam)}` : '';
-                linkClockOut.href = `clock-out.html${bParam || tokenParam ? '?' : ''}${bParam}${bParam && tokenParam ? '&' : ''}${tokenParam ? 'attendance_token=' + encodeURIComponent(tokenParam) : ''}`;
+                const linkClockIn = document.getElementById("linkClockIn");
+                const linkClockOut = document.getElementById("linkClockOut");
+                if (linkClockIn) linkClockIn.href = `clock-in.html?branch=${encodeURIComponent(branchParam)}`;
+                if (linkClockOut) linkClockOut.href = `clock-out.html?branch=${encodeURIComponent(branchParam)}`;
             }
 
             function clearAlerts() {
@@ -360,7 +365,7 @@
                     }
                 } catch (err) {
                     console.error("Login error:", err);
-                    showError("Could not connect to backend server. Please check your network connection and try again.");
+                    showError("Could not connect to backend server. Ensure 'py server.py' is running on port 5000.");
                     staffSubmitBtn.disabled = false;
                     staffSubmitBtn.textContent = "Sign In to Dashboard ➔";
                 }
@@ -412,7 +417,7 @@
                     }
                 } catch (err) {
                     console.error("Create password error:", err);
-                    showError("Could not connect to backend server. Please check your network connection and try again.");
+                    showError("Could not connect to backend server. Ensure 'py server.py' is running on port 5000.");
                     createSubmitBtn.disabled = false;
                     createSubmitBtn.textContent = "Create Password & Access Dashboard ➔";
                 }
@@ -420,5 +425,5 @@
         });
     </script>
 </body>
-</html>
 
+</html>
