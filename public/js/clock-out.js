@@ -31,8 +31,29 @@ document.addEventListener("DOMContentLoaded", () => {
         return endpoint;
     }
 
+    // Unified fetch with automatic 5-second retry for cold starts
+    async function fetchWithRetry(url, options = {}, retries = 1, onStatus = null) {
+        try {
+            const res = await fetch(url, options);
+            if (!res.ok && [502, 503, 504].includes(res.status) && retries > 0) {
+                throw new Error(`Server status ${res.status}`);
+            }
+            return res;
+        } catch (err) {
+            if (retries > 0) {
+                const wakeupMsg = "Connecting to server (waking up free tier)...";
+                if (typeof onStatus === "function") {
+                    onStatus(wakeupMsg);
+                }
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                return fetchWithRetry(url, options, retries - 1, onStatus);
+            }
+            throw err;
+        }
+    }
+
     // Fetch server info
-    fetch(getApiUrl("/api/server-info"))
+    fetchWithRetry(getApiUrl("/api/server-info"), {}, 1)
         .then(res => res.json())
         .then(data => {
             if (data.centre_name && centreNameEl) {
@@ -203,10 +224,17 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
-            const res = await fetch(getApiUrl("/api/attendance/clock-out"), {
+            const res = await fetchWithRetry(getApiUrl("/api/attendance/clock-out"), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(clockOutPayload)
+            }, 1, (statusMsg) => {
+                if (triggerBtn) triggerBtn.innerHTML = `<span>⏳ ${statusMsg}</span>`;
+                if (alertEl) {
+                    alertEl.className = "alert alert-info";
+                    alertEl.textContent = statusMsg;
+                    alertEl.style.display = "flex";
+                }
             });
 
             const data = await res.json();

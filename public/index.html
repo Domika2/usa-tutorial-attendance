@@ -249,15 +249,34 @@
 
             function getApiUrl(endpoint) {
                 if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
-                if (window.location.port === "5000") return endpoint;
-                const host = window.location.hostname && window.location.hostname !== "" ? window.location.hostname : "127.0.0.1";
-                return `http://${host}:5000${endpoint}`;
+                return endpoint;
+            }
+
+            // Unified fetch with automatic 5-second retry for cold starts
+            async function fetchWithRetry(url, options = {}, retries = 1, onStatus = null) {
+                try {
+                    const res = await fetch(url, options);
+                    if (!res.ok && [502, 503, 504].includes(res.status) && retries > 0) {
+                        throw new Error(`Server status ${res.status}`);
+                    }
+                    return res;
+                } catch (err) {
+                    if (retries > 0) {
+                        const wakeupMsg = "Connecting to server (waking up free tier)...";
+                        if (typeof onStatus === "function") {
+                            onStatus(wakeupMsg);
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 5000));
+                        return fetchWithRetry(url, options, retries - 1, onStatus);
+                    }
+                    throw err;
+                }
             }
 
             // Check admin status
             async function checkAdminStatus() {
                 try {
-                    const res = await fetch(getApiUrl("/api/admin/auth-status"));
+                    const res = await fetchWithRetry(getApiUrl("/api/admin/auth-status"), {}, 1);
                     const data = await res.json();
                     hasAdminAccount = data.has_admin;
                     if (data.centre_name && centreNameDisplay) {
@@ -345,10 +364,13 @@
                 staffSubmitBtn.textContent = "Verifying Password...";
 
                 try {
-                    const res = await fetch(getApiUrl("/api/admin/login"), {
+                    const res = await fetchWithRetry(getApiUrl("/api/admin/login"), {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ username, password })
+                    }, 1, (statusMsg) => {
+                        staffSubmitBtn.textContent = statusMsg;
+                        showError(statusMsg);
                     });
 
                     const data = await res.json();
@@ -365,7 +387,7 @@
                     }
                 } catch (err) {
                     console.error("Login error:", err);
-                    showError("Could not connect to backend server. Ensure 'py server.py' is running on port 5000.");
+                    showError("Could not connect to backend server. Please verify your connection and try again.");
                     staffSubmitBtn.disabled = false;
                     staffSubmitBtn.textContent = "Sign In to Dashboard ➔";
                 }
@@ -394,10 +416,13 @@
                 createSubmitBtn.textContent = "Creating Password...";
 
                 try {
-                    const res = await fetch(getApiUrl("/api/admin/create-password"), {
+                    const res = await fetchWithRetry(getApiUrl("/api/admin/create-password"), {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ full_name, username, password, role })
+                    }, 1, (statusMsg) => {
+                        createSubmitBtn.textContent = statusMsg;
+                        showError(statusMsg);
                     });
 
                     const data = await res.json();
@@ -417,7 +442,7 @@
                     }
                 } catch (err) {
                     console.error("Create password error:", err);
-                    showError("Could not connect to backend server. Ensure 'py server.py' is running on port 5000.");
+                    showError("Could not connect to backend server. Please verify your connection and try again.");
                     createSubmitBtn.disabled = false;
                     createSubmitBtn.textContent = "Create Password & Access Dashboard ➔";
                 }

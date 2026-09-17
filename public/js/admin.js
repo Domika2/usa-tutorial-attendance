@@ -5,6 +5,56 @@ document.addEventListener("DOMContentLoaded", () => {
         return endpoint;
     }
 
+    // Friendly server connection notice helper for free-tier / cold starts
+    function showServerWakeupNotice(msg = "Connecting to server (waking up free tier)...") {
+        let notice = document.getElementById("serverWakeupNotice");
+        if (!notice) {
+            notice = document.createElement("div");
+            notice.id = "serverWakeupNotice";
+            notice.style.cssText = "position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 999999; background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; border-radius: 9999px; padding: 0.6rem 1.4rem; font-size: 0.88rem; font-weight: 600; box-shadow: 0 4px 14px rgba(0,0,0,0.12); display: flex; align-items: center; gap: 0.6rem; transition: all 0.3s ease;";
+            notice.innerHTML = `<span style="display:inline-block;width:10px;height:10px;background:#3b82f6;border-radius:50%;"></span> <span id="serverWakeupNoticeText"></span>`;
+            document.body.appendChild(notice);
+        }
+        const textEl = document.getElementById("serverWakeupNoticeText");
+        if (textEl) textEl.textContent = msg;
+        notice.style.display = "flex";
+        notice.style.opacity = "1";
+    }
+
+    function hideServerWakeupNotice() {
+        const notice = document.getElementById("serverWakeupNotice");
+        if (notice) {
+            notice.style.opacity = "0";
+            setTimeout(() => { notice.style.display = "none"; }, 300);
+        }
+    }
+
+    // Unified fetch with automatic 5-second retry on cold starts and network delays
+    async function fetchWithRetry(url, options = {}, retries = 1, onStatus = null) {
+        try {
+            const res = await fetch(url, options);
+            // Free-tier cloud proxies (Render, Railway) return 502/503/504 while spinning up
+            if (!res.ok && [502, 503, 504].includes(res.status) && retries > 0) {
+                throw new Error(`Server waking up (${res.status})`);
+            }
+            hideServerWakeupNotice();
+            return res;
+        } catch (err) {
+            if (retries > 0) {
+                const wakeupMsg = "Connecting to server (waking up free tier)...";
+                if (typeof onStatus === "function") {
+                    onStatus(wakeupMsg);
+                } else {
+                    showServerWakeupNotice(wakeupMsg);
+                }
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                return fetchWithRetry(url, options, retries - 1, onStatus);
+            }
+            hideServerWakeupNotice();
+            throw err;
+        }
+    }
+
     const authModal = document.getElementById("authModal");
     const staffLoginForm = document.getElementById("staffLoginForm");
     const staffLoginName = document.getElementById("staffLoginName");
@@ -132,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Check Auth Status from server
     async function checkAuthStatus() {
         try {
-            const res = await fetch(getApiUrl("/api/admin/auth-status"));
+            const res = await fetchWithRetry(getApiUrl("/api/admin/auth-status"), {}, 1);
             const data = await res.json();
             if (data.centre_name && centreTitleEl) centreTitleEl.textContent = data.centre_name;
             if (!data.has_admin) {
@@ -239,10 +289,13 @@ document.addEventListener("DOMContentLoaded", () => {
             pinSubmitBtn.textContent = "Verifying Password...";
 
             try {
-                const res = await fetch(getApiUrl("/api/admin/login"), {
+                const res = await fetchWithRetry(getApiUrl("/api/admin/login"), {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ username, password })
+                }, 1, (statusMsg) => {
+                    pinSubmitBtn.textContent = statusMsg;
+                    showPinError(statusMsg, false);
                 });
 
                 const data = await res.json();
@@ -294,10 +347,13 @@ document.addEventListener("DOMContentLoaded", () => {
             createSubmitBtn.textContent = "Creating Password...";
 
             try {
-                const res = await fetch(getApiUrl("/api/admin/create-password"), {
+                const res = await fetchWithRetry(getApiUrl("/api/admin/create-password"), {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ full_name, username, password, role })
+                }, 1, (statusMsg) => {
+                    createSubmitBtn.textContent = statusMsg;
+                    showPinError(statusMsg, false);
                 });
 
                 const data = await res.json();
@@ -370,7 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
             savePassBtn.textContent = "Updating...";
 
             try {
-                const res = await fetch(getApiUrl("/api/admin/change-password"), {
+                const res = await fetchWithRetry(getApiUrl("/api/admin/change-password"), {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -381,6 +437,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         old_password,
                         new_password
                     })
+                }, 1, (statusMsg) => {
+                    savePassBtn.textContent = statusMsg;
+                    showChangePassAlert(statusMsg, "info");
                 });
 
                 const data = await res.json();
@@ -406,17 +465,40 @@ document.addEventListener("DOMContentLoaded", () => {
         changePassAlert.className = `alert alert-${type}`;
         changePassAlert.textContent = msg;
         changePassAlert.style.display = "flex";
+        if (type === "info") {
+            changePassAlert.style.background = "#eff6ff";
+            changePassAlert.style.borderColor = "#93c5fd";
+            changePassAlert.style.color = "#1d4ed8";
+        } else {
+            changePassAlert.style.background = "";
+            changePassAlert.style.borderColor = "";
+            changePassAlert.style.color = "";
+        }
     }
 
     function clearAuthAlerts() {
-        if (pinError) pinError.style.display = "none";
+        if (pinError) {
+            pinError.style.display = "none";
+            pinError.style.background = "";
+            pinError.style.borderColor = "";
+            pinError.style.color = "";
+        }
         if (pinSuccess) pinSuccess.style.display = "none";
     }
 
-    function showPinError(msg) {
+    function showPinError(msg, isError = true) {
         if (pinError) {
             pinError.textContent = msg;
             pinError.style.display = "flex";
+            if (!isError) {
+                pinError.style.background = "#eff6ff";
+                pinError.style.borderColor = "#93c5fd";
+                pinError.style.color = "#1d4ed8";
+            } else {
+                pinError.style.background = "";
+                pinError.style.borderColor = "";
+                pinError.style.color = "";
+            }
         }
         if (pinSuccess) pinSuccess.style.display = "none";
     }
@@ -448,7 +530,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const branch = branchFilter ? branchFilter.value : "ALL";
 
         try {
-            const res = await fetch(getApiUrl(`/api/admin/dashboard?token=${encodeURIComponent(authToken)}&branch=${encodeURIComponent(branch)}`));
+            const res = await (silent ? fetch(getApiUrl(`/api/admin/dashboard?token=${encodeURIComponent(authToken)}&branch=${encodeURIComponent(branch)}`))
+                                      : fetchWithRetry(getApiUrl(`/api/admin/dashboard?token=${encodeURIComponent(authToken)}&branch=${encodeURIComponent(branch)}`), {}, 1));
             if (res.status === 401) {
                 sessionStorage.removeItem("admin_auth_token");
                 authToken = null;
@@ -588,7 +671,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const url = `/api/admin/records?token=${encodeURIComponent(authToken)}&search=${encodeURIComponent(search)}&date=${encodeURIComponent(date)}&status=${encodeURIComponent(status)}&branch=${encodeURIComponent(branch)}`;
 
         try {
-            const res = await fetch(getApiUrl(url));
+            const res = await (silent ? fetch(getApiUrl(url))
+                                      : fetchWithRetry(getApiUrl(url), {}, 1));
             if (res.status === 401) return;
 
             const data = await res.json();
@@ -772,7 +856,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             try {
-                const res = await fetch(getApiUrl(`/api/admin/manual-record?token=${encodeURIComponent(authToken)}`), {
+                const res = await fetchWithRetry(getApiUrl(`/api/admin/manual-record?token=${encodeURIComponent(authToken)}`), {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -788,6 +872,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         time_out,
                         notes
                     })
+                }, 1, (statusMsg) => {
+                    showManualAlert(statusMsg, "info");
                 });
 
                 const data = await res.json();
@@ -799,7 +885,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     showManualAlert(data.message || "Failed to create record.", "danger");
                 }
             } catch (err) {
-                showManualAlert("Network error.", "danger");
+                showManualAlert("Could not connect to backend server. Please verify your connection and try again.", "danger");
             }
         });
     }

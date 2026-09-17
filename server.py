@@ -99,7 +99,7 @@ class AttendanceHandler(http.server.BaseHTTPRequestHandler):
         return database.verify_staff_session(token)
 
     def serve_static(self, path):
-        clean_path = path.lstrip("/").replace("/", os.sep)
+        clean_path = path.split("?")[0].lstrip("/").replace("/", os.sep)
         if not clean_path or clean_path == "index":
             clean_path = "index.html"
         elif clean_path in ["clock-in", "clockin"]:
@@ -142,6 +142,11 @@ class AttendanceHandler(http.server.BaseHTTPRequestHandler):
             parsed_url = urllib.parse.urlparse(self.path)
             path = parsed_url.path
             query_params = urllib.parse.parse_qs(parsed_url.query)
+
+            # Health check routes (for Render/cloud free-tier waking & monitoring)
+            if path in ("/api/health", "/health"):
+                self.send_json({"status": "ok"})
+                return
 
             # API Endpoints
             if path.startswith("/api/"):
